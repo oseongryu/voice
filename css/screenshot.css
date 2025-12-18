@@ -1,0 +1,917 @@
+/* Screenshot page specific styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+  color: #333333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+/* 한 줄 헤더 구조 */
+.header {
+  background: #f8f9fa;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.header-main::-webkit-scrollbar {
+  display: none;
+}
+
+/* 모드 선택 스타일 */
+.mode-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 0.2rem;
+}
+
+.mode-btn {
+  border-radius: 4px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.8rem !important;
+  transition: all 0.2s ease !important;
+  min-width: auto !important;
+}
+
+.mode-btn.active {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #333 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 메인 컨트롤 영역 */
+.main-controls {
+  flex: 1;
+  min-width: 0;
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  /* overflow issue fix: remove hidden overflow to allow dropdowns */
+  overflow: visible;
+  flex-wrap: wrap;
+  /* allow wrapping if too many buttons */
+}
+
+.control-buttons::-webkit-scrollbar {
+  display: none;
+}
+
+/* 정보 섹션 */
+.info-section {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* 좌표 및 줌 컨트롤 스타일 */
+.coordinates {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.zoom-btn {
+  padding: 0.3rem 0.5rem !important;
+  font-size: 0.8rem !important;
+  min-width: 32px !important;
+  border-radius: 4px !important;
+}
+
+.zoom-level {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+  min-width: 40px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 데스크톱에서 더 나은 플로우를 위한 추가 스타일 */
+@media (min-width: 769px) {
+  .header-controls {
+    gap: 0.75rem;
+  }
+
+  .control-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .primary-controls,
+  .action-controls,
+  .record-controls {
+    gap: 0.5rem;
+  }
+
+  /* 데스크톱에서는 좌표와 줌을 한 줄로 */
+  .info-controls {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* WebSocket 관련 스타일 */
+.ws-settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 2100;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.ws-settings-panel h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.setting-row label {
+  color: #555;
+  font-weight: 500;
+}
+
+.setting-row input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 120px;
+}
+
+.setting-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.ws-status {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.ws-status.connected {
+  background: #d4edda;
+  color: #155724;
+}
+
+.ws-status.disconnected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.streaming-stats {
+  font-size: 0.8rem;
+  color: #666;
+  margin-left: 0.5rem;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 웹소켓 버튼 스타일 개선 */
+.btn.danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn.danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn.danger:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* bottom toast styling */
+.bottom-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 16px;
+  min-width: 220px;
+  max-width: 90vw;
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: rgba(52, 58, 64, 0.9);
+  color: white;
+  z-index: 3000;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.bottom-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.bottom-toast.info {
+  background: rgba(23, 162, 184, 0.95);
+}
+
+.bottom-toast.success {
+  background: rgba(40, 167, 69, 0.95);
+}
+
+.bottom-toast.error {
+  background: rgba(220, 53, 69, 0.95);
+}
+
+/* Voice activation button styles */
+.btn#voiceActivationBtn,
+.btn#voiceActivationBtnWs {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.btn#voiceActivationBtn.active,
+.btn#voiceActivationBtnWs.active {
+  background: #28a745 !important;
+  box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+  animation: pulse-voice 2s infinite;
+}
+
+@keyframes pulse-voice {
+  0% {
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(40, 167, 69, 0.8);
+  }
+
+  100% {
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+  }
+}
+
+.container {
+  flex: 1;
+  padding: 0;
+  /* 패딩 제거하여 전체 화면 사용 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+.screenshot-container {
+  width: 100%;
+  max-width: 100vw;
+  max-height: 95vh;
+  background: black;
+  /* 배경색을 검정으로 통일 */
+  border-radius: 0;
+  /* 테두리 둥글기 제거 */
+  box-shadow: none;
+  /* 그림자 제거 */
+  overflow: hidden;
+  position: relative;
+  display: none;
+  /* layout children horizontally: main content + right sidebar */
+  flex-direction: row;
+  margin-top: 0;
+  /* 상단 여백 제거 */
+  flex: 1;
+  border: none;
+}
+
+.screenshot-container.visible {
+  display: flex;
+}
+
+.screenshot-header {
+  background: #f8f9fa;
+  color: #333333;
+  padding: 0.25rem 0.6rem;
+  display: flex;
+  border-bottom: 1px solid #dee2e6;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 32px;
+}
+
+/* Zoom controls in header */
+.zoom-controls {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.zoom-level {
+  min-width: 48px;
+  text-align: center;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+}
+
+.coordinates {
+  font-family: monospace;
+  font-size: 0.7rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.header-toast {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  text-align: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  min-height: 1rem;
+}
+
+.header-toast.show {
+  opacity: 1;
+}
+
+.header-toast.success {
+  background: rgba(40, 167, 69, 0.8);
+  color: white;
+}
+
+.header-toast.error {
+  background: rgba(220, 53, 69, 0.8);
+  color: white;
+}
+
+.header-toast.info {
+  background: rgba(23, 162, 184, 0.8);
+  color: white;
+}
+
+.close-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #c82333;
+}
+
+.screenshot-content {
+  position: relative;
+  overflow: auto;
+  max-height: calc(98vh - 32px);
+  background: #000000;
+  flex: 1;
+  display: flex;
+  /* align to top so the image is rendered from the top edge (no vertical centering) */
+  align-items: flex-start;
+  justify-content: center;
+}
+
+
+
+.screenshot-image {
+  width: auto;
+  height: auto;
+  cursor: crosshair;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.click-indicator {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ff4757;
+  border-radius: 50%;
+  background: rgba(255, 71, 87, 0.3);
+  pointer-events: none;
+  z-index: 10;
+  animation: clickPulse 0.6s ease-out;
+}
+
+@keyframes clickPulse {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.instructions {
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #1565c0;
+  text-align: center;
+}
+
+.instructions-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal overlay to dim background and improve contrast */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  /* slightly darker for readability */
+  backdrop-filter: blur(2px);
+  z-index: 2001;
+}
+
+/* Make modal content more readable while keeping slight translucency */
+.instructions-modal .modal-content {
+  position: relative;
+  /* keep above overlay */
+  z-index: 2002;
+  background: rgba(255, 255, 255, 0.96);
+  /* near-opaque white for readability */
+  color: #111;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.instructions-modal .modal-header,
+.instructions-modal .modal-body {
+  color: #111;
+  /* ensure dark text inside modal */
+}
+
+/* Dark theme variant (if you want preserved translucent look) */
+.instructions-modal.translucent .modal-content {
+  background: rgba(255, 255, 255, 0.85);
+  color: #0b1220;
+}
+
+/* Ensure modal buttons are clearly visible in screenshot theme (override translucent .btn) */
+.instructions-modal .modal-body .btn {
+  background: #f6f7f9 !important;
+  color: #111 !important;
+  border: 1px solid #d0d7de !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+.instructions-modal .modal-body .btn.primary {
+  background: #007bff !important;
+  color: #fff !important;
+  border-color: #007bff !important;
+}
+
+.instructions-modal .modal-body .btn.warning {
+  background: #ffc107 !important;
+  color: #212529 !important;
+  border-color: #e0a800 !important;
+}
+
+.instructions-modal .modal-body .btn.info {
+  background: #17a2b8 !important;
+  color: #fff !important;
+  border-color: #138496 !important;
+}
+
+
+.instructions-modal .modal-body .btn.cancel-btn {
+  background: #f1f3f5 !important;
+  color: #111 !important;
+  border: 1px solid #c7cbd0 !important;
+}
+
+.instructions-modal .modal-body .btn.key-btn {
+  background: linear-gradient(180deg, #f1f5f9 0%, #e6eef8 100%) !important;
+  color: #0b1220 !important;
+  border: 1px solid #bcd0e6 !important;
+  box-shadow: 0 2px 4px rgba(11, 18, 32, 0.06) !important;
+}
+
+.instructions-modal .modal-body .btn:hover {
+  filter: brightness(0.98) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Remote login modal styling (Windows-like simple) */
+.remote-login-box {
+  background: #f8f9fa;
+  color: #333333;
+  padding: 1.25rem;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  width: 380px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.remote-login-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.remote-login-input {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  color: #333333;
+}
+
+.remote-login-note {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+/* Template Selection Overlay */
+.template-selection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.selection-rectangle {
+  position: absolute;
+  border: 2px dashed #007bff;
+  background: rgba(0, 123, 255, 0.1);
+  pointer-events: none;
+  display: none;
+}
+
+.selection-hint {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 123, 255, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  z-index: 1001;
+  display: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.screenshot-container.template-selection-mode .screenshot-image {
+  cursor: crosshair;
+}
+
+.screenshot-container.template-selection-mode .template-selection-overlay {
+  pointer-events: all;
+}
+
+
+/* Bootstrap Dropdown & Navbar Fixes */
+.dropdown-menu {
+  z-index: 5000 !important;
+  /* Ensure it appears above modals/overlays */
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+.dropdown-item {
+  color: #212529 !important;
+  cursor: pointer;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #e9ecef !important;
+  color: #1e2125 !important;
+}
+
+/* Ensure navbar is above other content */
+.navbar {
+  z-index: 1030;
+}
+
+/* Voice Command Floating Overlay */
+.voice-command-overlay {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(33, 37, 41, 0.95);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  min-width: 300px;
+  text-align: center;
+  display: none;
+  /* Hidden by default */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.voice-command-header {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2ecc71;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.voice-command-header i {
+  animation: pulse-mic 1.5s infinite;
+}
+
+@keyframes pulse-mic {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.voice-command-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.command-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border-left: 3px solid #3498db;
+}
+
+/* Floating Header Styles */
+.header-floating-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 2000;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  display: none;
+  /* Hidden by default */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: #333;
+}
+
+/* Show button only in floating mode */
+body.floating-header-mode .header-floating-btn {
+  display: flex !important;
+}
+
+.header-floating-btn:hover {
+  transform: scale(1.1);
+  background: #f8f9fa;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.header-floating-btn i {
+  font-size: 1.4rem;
+  transition: transform 0.3s ease;
+}
+
+/* Floating Header Enabled State */
+body.floating-header-mode #topNavbar {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  left: auto;
+  width: auto;
+  min-width: 320px;
+  max-width: calc(100vw - 30px);
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+  flex-wrap: wrap;
+  z-index: 2001;
+  /* Above button if needed, or same level */
+}
+
+body.floating-header-mode #topNavbar.show {
+  transform: translateX(0);
+}
+
+/* Adjust button when header is shown */
+body.floating-header-mode.header-visible .header-floating-btn {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+/* Fullscreen adjustments for main content */
+body.floating-header-mode .container {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding-top: 0 !important;
+}
+
+body.floating-header-mode .screenshot-container {
+  height: 100% !important;
+  max-height: 100% !important;
+  border: none;
+}
+
+/* Optional: Add a backdrop when header is open */
+/* Backdrop removed/disabled as per user request to not auto-hide */
+.header-backdrop {
+  display: none !important;
+}
+
+/* Floating Header Collapse Button */
+body.floating-header-mode .floating-collapse-btn {
+  display: inline-block !important;
+}
+
+body:not(.floating-header-mode) .floating-collapse-btn {
+  display: none !important;
+}
+
+
+.command-item.close-command {
+  border-left-color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.voice-command-status {
+  font-size: 0.85rem;
+  color: #aaa;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}

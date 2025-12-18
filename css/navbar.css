@@ -1,0 +1,151 @@
+/* Bootstrap Override & Customization */
+.navbar {
+  padding: 0.2rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f8f9fa !important;
+  z-index: 1030;
+  /* 다른 요소 위에 표시 */
+}
+
+/* 모바일에서 버튼 터치 시 회색 배경 방지 */
+/* 모바일 버튼 색상 수정 (터치/포커스 시 텍스트가 안 보이는 문제 해결) */
+.navbar .btn:not(.btn-success):not(.btn-primary):active,
+.navbar .btn:not(.btn-success):not(.btn-primary):focus,
+.navbar .btn:not(.btn-success):not(.btn-primary).active {
+  background-color: transparent !important;
+  border-color: #6c757d !important;
+  color: #6c757d !important;
+  box-shadow: none !important;
+}
+
+
+/* 활성화된 버튼은 녹색 유지 */
+.navbar .btn.btn-success:active,
+.navbar .btn.btn-success:focus {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+}
+
+/* 터치 하이라이트 제거 */
+.navbar .btn {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+
+.navbar-brand {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Tablet/Fold Optimization - Compact menu */
+@media (min-width: 576px) and (max-width: 991px) {
+  .navbar {
+    padding: 0.2rem 0.5rem;
+  }
+
+  .navbar-brand {
+    font-size: 0.85rem;
+    margin-right: 0.4rem !important;
+  }
+
+  .mode-btn-group {
+    margin-right: 0.4rem !important;
+  }
+
+  .mode-btn-group .btn {
+    padding: 0.2rem 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .mode-btn-group .btn span {
+    display: none;
+  }
+
+  .navbar-nav .nav-item {
+    margin-right: 0.2rem !important;
+  }
+
+  .navbar-nav .btn-sm {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.8rem;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.8rem;
+  }
+
+  .navbar-nav .dropdown-toggle::after {
+    margin-left: 0.15rem;
+  }
+
+  /* Hide text, show only icons - REMOVED to show text with i18n
+  .navbar-nav .btn-sm i+*,
+  .navbar-nav .dropdown-toggle i+* {
+    display: none;
+  }
+  */
+
+  .form-check-label {
+    font-size: 0.8rem;
+  }
+
+  .coordinate-display {
+    margin-left: 0.4rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .coordinate-display #coordinates {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .coordinate-display .btn-group-sm .btn {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.7rem;
+  }
+
+  #zoomLevelLabel {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* Mobile Single Line Navbar Support */
+#topNavbar .container-fluid,
+#topNavbar .navbar-collapse {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+}
+
+#topNavbar .container-fluid::-webkit-scrollbar,
+#topNavbar .navbar-collapse::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
+}
+
+/* Prevent dropdown clipping by making it fixed positioned */
+#topNavbar .dropdown-menu {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 90%;
+  max-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  border-radius: 0.5rem;
+  z-index: 2000;
+  /* Higher than navbar */
+}
+
+/* Add a backdrop effect logic if needed, but for now shadow is enough */

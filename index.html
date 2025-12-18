@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>화면 제어 - 음성 텍스트 변환</title>
+  <!-- AG Grid CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css" />
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Toast Notification Settings -->
+  <script>
+    /**
+     * 토스트 알림 설정 (Toast Notification Settings)
+     * 원하는 알림만 표시되도록 설정할 수 있습니다.
+     */
+    window.TOAST_SETTINGS = {
+      // 전체 토스트 시스템 활성화 여부 (Master Switch)
+      ENABLED: true,
+
+      // 알림 카테고리별 표시 여부 설정
+      // show: true (표시), show: false (숨김)
+      CATEGORIES: {
+        // 클릭 및 좌표 관련 알림
+        'CLICK': {
+          keywords: ['클릭', '좌표', 'Click', 'Coordinate', '터치'],
+          show: false
+        },
+        // 스크린샷 촬영 관련 알림
+        'SCREENSHOT': {
+          keywords: ['스크린샷', '촬영', 'Screenshot', '캡처'],
+          show: false
+        },
+        // 웹소켓 및 스트리밍 상태 알림
+        'WEBSOCKET': {
+          keywords: ['웹소켓', 'WebSocket', '스트리밍', '연결', 'Ping'],
+          show: false
+        },
+        // 음성 인식 관련 알림
+        'VOICE': {
+          keywords: ['음성', '인식', '명령', 'Voice', '트리거'],
+          show: true
+        },
+        // 모드 전환 알림
+        'MODE': {
+          keywords: ['모드', 'Mode'],
+          show: false
+        },
+        // 텍스트/키 입력 알림
+        'INPUT': {
+          keywords: ['입력', '타이핑', '키', 'Input', 'Type'],
+          show: false
+        },
+        // 오류 및 경고
+        'ERROR': {
+          keywords: ['오류', '실패', '경고', 'Error', 'Fail', 'Warning'],
+          show: false
+        }
+      },
+
+      // 분류되지 않은 기타 알림 표시 여부
+      SHOW_UNCATEGORIZED: false
+    };
+  </script>
+  <link rel="stylesheet" href="css/screenshot.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+</head>
+
+<body>
+  <!-- Bootstrap Navbar -->
+  <nav id="topNavbar" class="navbar navbar-expand navbar-light bg-light">
+    <div class="container-fluid">
+      <!-- Floating Header Collapse Button -->
+      <button class="btn btn-sm btn-outline-secondary me-2 floating-collapse-btn" onclick="toggleFloatingHeader()"
+        title="메뉴 숨기기" style="display: none;">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+
+      <!-- Brand & Mode Selector -->
+      <a class="navbar-brand me-3" href="#" data-i18n="nav.brand">제어</a>
+
+      <!-- Navbar Content -->
+      <div class="navbar-collapse" id="mainNavbar">
+        <!-- Screenshot Mode Controls -->
+        <ul id="mainNavButtons" class="navbar-nav mb-2 mb-sm-0 align-items-center flex-row">
+          <!-- Main Action: Screenshot (Visible only in Screenshot Mode) -->
+          <li class="nav-item me-2" id="screenshotActionItem">
+            <button id="takeScreenshotBtn" class="btn btn-primary btn-sm" onclick="takeNewScreenshot()"
+              title="새 스크린샷 캡처">
+              <i class="bi bi-camera-fill"></i> <span data-i18n="nav.screenshot">화면</span>
+            </button>
+          </li>
+
+          <!-- Text Input Button -->
+          <li class="nav-item me-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="showTypeTextModal()" title="텍스트 입력">
+              <i class="bi bi-keyboard"></i> <span data-i18n="nav.text">Text</span>
+            </button>
+          </li>
+
+
+
+          <!-- Mouse Mode Button -->
+          <li class="nav-item me-2">
+            <button id="mouseModeBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleMouseMode()"
+              title="마우스 이동 모드">
+              <i class="bi bi-cursor-fill"></i> <span data-i18n="nav.mouse">마우스</span>
+            </button>
+          </li>
+
+          <!-- Voice Button -->
+          <li class="nav-item me-2">
+            <button id="voiceBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleVoiceActivation()"
+              title="음성 인식">
+              <i class="bi bi-mic-fill"></i> <span data-i18n="nav.voice">음성</span>
+            </button>
+          </li>
+
+          <!-- WebSocket Toggle Button (Live Connection) -->
+          <li class="nav-item me-2">
+            <button id="wsToggleBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleWebSocketConnection()"
+              title="라이브">
+              <i class="bi bi-plug"></i>라이브
+            </button>
+          </li>
+
+          <!-- Tools Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              <i class="bi bi-tools"></i> <span data-i18n="nav.tools">도구</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+              <li><button class="dropdown-item" onclick="showServerConfigModal()"><i class="bi bi-server"></i> <span>서버 설정</span></button></li>
+              <li><button class="dropdown-item" onclick="showSettingModal()"><i class="bi bi-gear"></i> <span
+                    data-i18n="nav.tools.debug">설정</span></button>
+              </li>
+              <li><button class="dropdown-item" onclick="showVoiceSettingsModal()"><i class="bi bi-mic-fill"></i> <span
+                    data-i18n="nav.tools.voice_settings">음성 설정</span></button>
+              </li>
+              <li><button class="dropdown-item" onclick="showClickRecorderModal()"><i class="bi bi-record-circle"></i>
+                  <span data-i18n="nav.tools.macro">매크로 기록</span></button></li>
+              <li><button class="dropdown-item" onclick="showVoiceHistoryModal()"><i class="bi bi-journal-text"></i>
+                  <span data-i18n="nav.tools.history">음성 히스토리</span></button></li>
+            </ul>
+          </li>
+
+          <!-- Coordinates -->
+          <li class="nav-item me-3">
+            <div id="coordinates"
+              class="badge bg-dark text-wrap font-monospace d-flex justify-content-center align-items-center"
+              style="font-size: 0.85rem; width: 140px;">(0, 0)</div>
+          </li>
+
+          <!-- Zoom Controls -->
+          <li class="nav-item">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" onclick="zoomOut()" title="축소"><i
+                  class="bi bi-dash"></i></button>
+              <span class="btn btn-outline-secondary disabled text-dark border-start-0 border-end-0" id="zoomLevelLabel"
+                style="opacity: 1; background: #fff; min-width: 50px;">100%</span>
+              <button class="btn btn-outline-secondary" onclick="zoomIn()" title="확대"><i
+                  class="bi bi-plus"></i></button>
+              <button class="btn btn-outline-secondary" onclick="resetZoom()" title="초기화"><i
+                  class="bi bi-arrow-counterclockwise"></i></button>
+              <button class="btn btn-outline-secondary" onclick="toggleFullScreen()" title="전체화면"><i
+                  class="bi bi-arrows-fullscreen"></i></button>
+              <button class="btn btn-outline-secondary" onclick="fitToScreen()" title="재조정"><i
+                  class="bi bi-arrow-repeat"></i></button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Floating Header Controls -->
+  <button id="floatingHeaderBtn" class="header-floating-btn" onclick="toggleFloatingHeader()" title="메뉴 열기">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <script>
+    /* Floating Header Logic */
+    function toggleFloatingHeader() {
+      const body = document.body;
+      const navbar = document.getElementById('topNavbar');
+
+      // Toggle visibility classes
+      const isVisible = body.classList.contains('header-visible');
+
+      if (isVisible) {
+        body.classList.remove('header-visible');
+        navbar.classList.remove('show');
+      } else {
+        body.classList.add('header-visible');
+        navbar.classList.add('show');
+      }
+    }
+  </script>
+
+  <div class="container">
+    <div id="screenshotContainer" class="screenshot-container">
+      <div class="screenshot-content">
+        <img id="screenshotImage" class="screenshot-image" alt="서버 화면" />
+      </div>
+
+    </div>
+
+    <!-- Voice Command Floating Overlay -->
+    <div id="voiceCommandOverlay" class="voice-command-overlay">
+      <div class="voice-command-header">
+        <i class="bi bi-mic-fill"></i> <span data-i18n="voice.listening">듣고 있습니다...</span>
+      </div>
+      <div id="voiceCommandStatus" class="voice-command-status" data-i18n="voice.status.ready">명령을 말씀하세요</div>
+    </div>
+
+    <!-- bottom toast area used for general messages -->
+    <div id="bottomToast" class="bottom-toast" aria-live="polite"></div>
+  </div>
+
+  <!-- Server Configuration Modal -->
+  <div class="modal fade" id="serverConfigModal" tabindex="-1" aria-labelledby="serverConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="serverConfigModalLabel"><i class="bi bi-server"></i> 서버 설정</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info" role="alert">
+            <strong>GitHub Pages 배포 모드</strong><br>
+            백엔드 서버의 URL을 입력하세요. 모든 API 요청이 이 서버로 전송됩니다.
+          </div>
+
+          <div class="mb-3">
+            <label for="serverUrlInput" class="form-label">서버 URL</label>
+            <input type="text" class="form-control" id="serverUrlInput"
+                   placeholder="http://localhost:8000 또는 https://your-server.com">
+            <div class="form-text">예: http://localhost:8000 또는 https://your-server.com</div>
+          </div>
+
+          <div id="serverStatus" class="alert" style="display: none;"></div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary" onclick="saveServerConfig()">저장 및 연결 테스트</button>
+          </div>
+
+          <hr>
+
+          <div class="mb-2">
+            <strong>현재 설정:</strong>
+          </div>
+          <div class="mb-2">
+            <code id="currentServerUrl">미설정</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setting Modal -->
+  <div class="modal fade" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header" style="padding: 0.5rem 1rem;">
+          <h6 class="modal-title" id="settingModalLabel" style="font-size: 0.95rem;">⚙️ 설정</h6>
+          <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+            style="font-size: 0.8rem;"></button>
+        </div>
+        <div class="modal-body">
+          <!-- UI 설정 섹션 -->
+          <div class="debug-section mb-4">
+            <h6 class="text-primary mb-2">⚙️ UI 설정</h6>
+            <div class="mb-3">
+              <label for="headerModeSelect" class="form-label">헤더 스타일 (Header Style):</label>
+              <select id="headerModeSelect" class="form-select" onchange="changeHeaderMode(this.value)">
+                <option value="normal">기본 (Normal)</option>
+                <option value="fixed">상단 고정 (Sticky)</option>
+                <option value="floating">플로팅 자동 숨김 (Floating)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="textModalPositionSelect" class="form-label">텍스트 입력 팝업 위치:</label>
+              <select id="textModalPositionSelect" class="form-select" onchange="changeTextModalPosition(this.value)">
+                <option value="top">상단</option>
+                <option value="center">중앙</option>
+                <option value="top-start">왼쪽 상단</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="screenshotDelayInput" class="form-label">스크린샷 갱신 지연시간 (ms):</label>
+              <div class="input-group">
+                <input type="number" id="screenshotDelayInput" class="form-control" value="1000" step="100" min="0"
+                  onchange="changeScreenshotDelay(this.value)">
+                <span class="input-group-text">ms</span>
+              </div>
+              <div class="form-text" style="font-size: 0.8rem;">입력/클릭 후 화면 갱신까지의 대기 시간 (기본값: 1000ms)</div>
+            </div>
+          </div>
+
+          <!-- 언어 설정 섹션 -->
+          <div class="debug-section mb-4">
+            <h6 class="text-primary mb-2" data-i18n="settings.language">🌐 언어 설정</h6>
+            <select id="languageSelect" class="form-select" onchange="setLanguage(this.value)">
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="en">🇺🇸 English</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 0.5rem 1rem;">
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetSettings()">
+            <i class="bi bi-arrow-counterclockwise"></i> 설정 초기화
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Click Recorder Modal -->
+  <div class="modal fade" id="clickRecorderModal" tabindex="-1" aria-labelledby="clickRecorderModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header" style="padding: 0.5rem 1rem;">
+          <h6 class="modal-title" id="clickRecorderModalLabel" style="font-size: 0.95rem;">📹 매크로 기록</h6>
+          <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+            style="font-size: 0.8rem;"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 녹화 컨트롤 -->
+          <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+            <button id="startRecordBtn" class="btn btn-primary btn-sm">녹화 시작</button>
+            <button id="stopRecordBtn" class="btn btn-secondary btn-sm" style="display:none">녹화 중지</button>
+            <button id="playbackBtn" class="btn btn-success btn-sm" disabled>재생</button>
+            <button id="deleteSelectedRecordingBtn" class="btn btn-warning btn-sm">선택삭제</button>
+            <button id="clearRecordingBtn" class="btn btn-outline-secondary btn-sm ms-auto">지우기</button>
+          </div>
+
+          <!-- 녹화 정보 -->
+          <div class="mb-3">
+            <label class="form-label">녹화된 이벤트 수: <span id="recordCount" class="badge bg-secondary">0</span></label>
+          </div>
+
+          <!-- 재생 속도 -->
+          <div class="mb-3">
+            <label for="playbackSpeed" class="form-label">재생 속도 (배율):</label>
+            <select id="playbackSpeed" class="form-select form-select-sm" style="max-width: 150px;">
+              <option value="1">1x</option>
+              <option value="0.5">0.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+
+          <!-- 이벤트 목록 -->
+          <div class="mb-3">
+            <label for="recordList" class="form-label">이벤트 목록 (시간, 유형, x, y)</label>
+            <textarea id="recordList" class="form-control font-monospace" style="height:160px; font-size:0.9rem;"
+              readonly></textarea>
+          </div>
+
+          <!-- 내보내기/불러오기 -->
+          <div class="d-flex gap-2 mb-3">
+            <button id="exportBtn" class="btn btn-outline-secondary btn-sm" disabled>내보내기 (JSON)</button>
+            <button id="importBtn" class="btn btn-outline-secondary btn-sm ms-auto">불러오기</button>
+            <input id="importFileInput" type="file" accept="application/json" style="display:none" />
+          </div>
+
+          <hr />
+
+          <!-- 그룹 저장 -->
+          <div class="d-flex gap-2 align-items-center mb-3">
+            <input id="saveGroupName" class="form-control form-control-sm" placeholder="그룹 이름을 입력하세요" />
+            <button id="saveGroupBtn" class="btn btn-primary btn-sm" disabled>저장</button>
+          </div>
+
+          <!-- 저장된 그룹 관리 -->
+          <div class="d-flex gap-2 align-items-center mb-3">
+            <label class="form-label mb-0" style="white-space:nowrap">저장된 그룹:</label>
+            <select id="savedGroupsSelect" class="form-select form-select-sm"></select>
+            <button id="loadGroupBtn" class="btn btn-outline-secondary btn-sm">불러오기</button>
+            <button id="deleteGroupBtn" class="btn btn-danger btn-sm">삭제</button>
+            <button id="runGroupBtn" class="btn btn-success btn-sm">실행</button>
+          </div>
+
+          <!-- 사용법 안내 -->
+          <div class="alert alert-info mb-0" role="alert">
+            <small>
+              <strong>사용법:</strong> 모달을 연 상태에서 스크린샷 이미지 위를 클릭하면 클릭 이벤트가 녹화됩니다.
+              재생 시 서버로 순차적으로 클릭 요청을 보냅니다.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text Input Modal -->
+  <div class="modal fade" id="typeTextModal" tabindex="-1" aria-labelledby="typeTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="typeTextModalDialog">
+      <div class="modal-content shadow-lg border-0 rounded-4">
+        <div class="modal-body p-4">
+          <!-- 입력 영역 -->
+          <div class="mb-3">
+            <textarea id="textToType" class="form-control" rows="3" placeholder="여기에 입력하세요..."></textarea>
+          </div>
+
+          <!-- 메인 액션 버튼 -->
+          <div class="d-grid gap-2 mb-3">
+            <div class="row g-2">
+              <div class="col">
+                <button class="btn btn-secondary w-100" data-bs-dismiss="modal" onclick="closeTypeTextModal()">
+                  취소
+                </button>
+              </div>
+              <div class="col">
+                <button class="btn btn-primary w-100 fw-bold" onclick="performTypeText()">
+                  전송
+                </button>
+              </div>
+              <div class="col">
+                <button id="textModalVoiceBtn" class="btn btn-danger w-100" onclick="toggleTextModalRecording()">
+                  <i class="bi bi-mic-fill"></i> 녹음
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 특수 키 영역 (항상 표시) -->
+          <div class="mt-3" id="specialKeysArea">
+            <div class="d-flex gap-3">
+              <!-- 왼쪽: 특수키 영역 -->
+              <div class="flex-grow-1">
+                <!-- 첫 번째 줄: Esc(좌), 빈공간(중), Backspace(우) -->
+                <div class="d-flex flex-wrap gap-1 mb-1">
+                  <button class="btn btn-light border btn-sm flex-fill" onclick="performKeyPress('escape')">Esc</button>
+                  <button class="btn btn-light border btn-sm flex-fill" style="visibility: hidden;">Del</button>
+                  <button class="btn btn-light border btn-sm flex-fill" onclick="performKeyPress('backspace')"
+                    title="Backspace"><i class="bi bi-backspace"></i></button>
+                </div>
+                <!-- 두 번째 줄: Tab(좌), Space(중), Enter(우) -->
+                <div class="d-flex flex-wrap gap-1 mb-1">
+                  <button class="btn btn-light border btn-sm flex-fill" onclick="performKeyPress('tab')">Tab</button>
+                  <button class="btn btn-light border btn-sm flex-fill" onclick="performKeyPress('space')">Space</button>
+                  <button class="btn btn-light border btn-sm flex-fill" onclick="performKeyPress('enter')">Enter</button>
+                </div>
+                <!-- 세 번째 줄: Ctrl 단축키 -->
+                <div class="d-flex gap-1 mb-3">
+                  <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                    onclick="performKeyCombination(['ctrl','c'])">Ctrl+C</button>
+                  <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                    onclick="performKeyCombination(['ctrl','v'])">Ctrl+V</button>
+                  <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                    onclick="performKeyCombination(['ctrl','a'])">Ctrl+A</button>
+                  <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                    onclick="performKeyCombination(['ctrl','z'])">Ctrl+Z</button>
+                  <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                    onclick="performKeyCombination(['ctrl','s'])">Ctrl+S</button>
+                </div>
+
+                <!-- 빈 공간 채우기 -->
+                <div class="flex-grow-1 text-center text-muted small">
+                  <!-- 필요시 여기에 추가 설명이나 빈 공간 유지 -->
+                </div>
+              </div>
+
+              <!-- 오른쪽: 네비게이션 및 화살표 영역 -->
+              <div class="d-flex flex-column gap-2">
+                <!-- 6키 클러스터 (Ins, Home, PgUp / Del, End, PgDn) -->
+                <div class="d-flex flex-column gap-1">
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                      onclick="performKeyPress('insert')">Ins</button>
+                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                      onclick="performKeyPress('home')">Home</button>
+                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                      onclick="performKeyPress('pageup')">PgUp</button>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                      onclick="performKeyPress('delete')">Del</button>
+                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                      onclick="performKeyPress('end')">End</button>
+                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                      onclick="performKeyPress('pagedown')">PgDn</button>
+                  </div>
+                </div>
+
+                <!-- 화살표 키 -->
+                <div class="d-flex flex-column gap-1 align-items-center mt-1">
+                  <div class="d-flex justify-content-center">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('up')" style="width: 45px;">
+                      <i class="bi bi-arrow-up"></i>
+                    </button>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('left')"
+                      style="width: 45px;">
+                      <i class="bi bi-arrow-left"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('down')"
+                      style="width: 45px;">
+                      <i class="bi bi-arrow-down"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('right')"
+                      style="width: 45px;">
+                      <i class="bi bi-arrow-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voice History Modal -->
+  <div class="modal fade" id="voiceHistoryModal" tabindex="-1" aria-labelledby="voiceHistoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header" style="padding: 0.5rem 1rem;">
+          <h6 class="modal-title" id="voiceHistoryModalLabel" style="font-size: 0.95rem;">🎤 음성 히스토리</h6>
+          <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+            style="font-size: 0.8rem;"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 텍스트 입력 섹션 -->
+          <div class="text-input-section mb-3">
+            <div class="input-group">
+              <input type="text" id="voiceTextInput" class="form-control"
+                placeholder="텍스트를 입력하고 Enter를 누르거나 추가 버튼을 클릭하세요..." />
+              <button id="voiceAddTextBtn" class="btn btn-primary" onclick="addTextToVoiceHistory()">
+                추가
+              </button>
+            </div>
+          </div>
+
+          <!-- 음성 및 제어 버튼 -->
+          <div class="voice-controls d-flex flex-wrap gap-2 mb-3">
+            <button id="voiceRequestPermissionBtn" class="btn btn-outline-secondary btn-sm"
+              onclick="requestVoiceMicrophonePermission()">
+              🎤 마이크 권한
+            </button>
+            <button id="voiceRecordBtn" class="btn btn-danger btn-sm" onclick="startVoiceRecording()">
+              음성녹음
+            </button>
+            <button id="voiceStopBtn" class="btn btn-dark btn-sm" onclick="stopVoiceRecording()" style="display: none">
+              녹음중지
+            </button>
+            <button id="voiceRefreshHistoryBtn" class="btn btn-secondary btn-sm" onclick="loadVoiceServerHistory()">
+              새로고침
+            </button>
+            <button id="voiceSelectAllBtn" class="btn btn-outline-secondary btn-sm" onclick="selectAllVoiceHistory()">
+              전체선택
+            </button>
+            <button id="voiceCopySelectedBtn" class="btn btn-outline-secondary btn-sm"
+              onclick="copySelectedVoiceHistory()">
+              선택복사
+            </button>
+            <button id="voiceCopyToServerBtn" class="btn btn-outline-primary btn-sm"
+              onclick="copySelectedToServerClipboard()">
+              서버복사
+            </button>
+            <button id="voiceExecuteSelectedBtn" class="btn btn-success btn-sm" onclick="executeSelectedVoiceHistory()">
+              실행
+            </button>
+            <button id="voiceDeleteSelectedBtn" class="btn btn-danger btn-sm" onclick="deleteSelectedVoiceHistory()"
+              style="display: none">
+              선택삭제
+            </button>
+            <button id="voiceClearServerHistoryBtn" class="btn btn-outline-danger btn-sm"
+              onclick="clearVoiceServerHistory()">
+              전체삭제
+            </button>
+            <button id="voiceExportHistoryBtn" class="btn btn-outline-secondary btn-sm" onclick="exportVoiceHistory()">
+              내보내기
+            </button>
+          </div>
+
+          <!-- 히스토리 카운터 -->
+          <div class="mb-2 text-muted">
+            음성 변환 히스토리 <span id="voiceHistoryCounter">(총 0개)</span>
+          </div>
+
+          <!-- 히스토리 그리드 -->
+          <div id="voiceGridContainer" class="ag-theme-alpine"
+            style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius: 4px">
+            <div class="loading-history d-flex align-items-center justify-content-center h-100 text-muted">
+              <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              히스토리를 불러오는 중...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voice Settings Modal - Included inline -->
+  <div class="modal fade" id="voiceSettingsModal" tabindex="-1" aria-labelledby="voiceSettingsModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+          <div class="modal-content">
+              <div class="modal-header" style="padding: 0.5rem 1rem;">
+                  <h6 class="modal-title" id="voiceSettingsModalLabel" style="font-size: 0.95rem;">
+                      <i class="bi bi-mic-fill"></i> <span data-i18n="modal.voice.title">음성 설정</span>
+                  </h6>
+                  <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+                      style="font-size: 0.8rem;"></button>
+              </div>
+              <div class="modal-body">
+
+                  <!-- 트리거 설정 -->
+                  <div class="card mb-4">
+                      <div class="card-header bg-light">
+                          <h6 class="mb-0" data-i18n="modal.voice.basic_settings">기본 설정</h6>
+                      </div>
+                      <div class="card-body">
+                          <div class="row g-3 align-items-end">
+                              <div class="col-md-7">
+                                  <label for="triggerPhraseInput" class="form-label"
+                                      data-i18n="modal.voice.trigger_phrase">호출어 (Trigger Phrase)</label>
+                                  <input type="text" class="form-control" id="triggerPhraseInput" placeholder="예: 인식해줘"
+                                      value="인식해줘">
+                                  <div class="form-text" data-i18n="modal.voice.trigger_help">음성 인식을 시작할 때 말하는 호출어입니다.
+                                  </div>
+                              </div>
+                              <div class="col-md-3">
+                                  <label for="timeoutInput" class="form-label" data-i18n="modal.voice.timeout">대기 시간
+                                      (초)</label>
+                                  <input type="number" class="form-control" id="timeoutInput" placeholder="5" value="5"
+                                      min="1" max="60">
+                                  <div class="form-text" data-i18n="modal.voice.timeout_help">호출 후 명령 대기 시간</div>
+              </div>
+                              <div class="col-md-2">
+                                  <button class="btn btn-primary w-100" type="button" onclick="saveBasicSettings()"
+                                      data-i18n="modal.voice.save">저장</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- 커스텀 명령어 목록 -->
+                  <div class="card">
+                      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                          <h6 class="mb-0" data-i18n="modal.voice.custom_commands">커스텀 명령어 관리</h6>
+                          <button class="btn btn-sm btn-primary" onclick="showAddCommandForm()">
+                              <i class="bi bi-plus-lg"></i> <span data-i18n="modal.voice.add_command">명령어 추가</span>
+                          </button>
+                      </div>
+                      <div class="card-body">
+
+                          <!-- 명령어 추가 폼 (기본 숨김) -->
+                          <div id="addCommandForm" class="mb-4 p-3 border rounded bg-light" style="display: none;">
+                              <h6 class="mb-3" data-i18n="modal.voice.new_command">새 명령어 추가</h6>
+                              <div class="row g-3">
+                                  <div class="col-md-4">
+                                      <label for="newCommandPhrase" class="form-label" data-i18n="modal.voice.phrase">명령어
+                                          (발화)</label>
+                                      <input type="text" class="form-control" id="newCommandPhrase" placeholder="예: 찰칵">
+                                  </div>
+                                  <div class="col-md-4">
+                                      <label for="newCommandAction" class="form-label">동작</label>
+                                      <select class="form-select" id="newCommandAction">
+                                          <option value="SCREENSHOT">스크린샷 촬영</option>
+                                          <option value="REFRESH">새로고침</option>
+                                          <option value="ZOOM_IN">확대</option>
+                                          <option value="ZOOM_OUT">축소</option>
+                                          <option value="ZOOM_RESET">줌 초기화</option>
+                                          <option value="TEXT_MODAL">텍스트 입력 창</option>
+                                          <option value="HISTORY_MODAL">히스토리 창</option>
+                                          <option value="DEBUG_MODAL">설정/디버그 창</option>
+                                          <option value="CLICK_RECORDER">매크로 기록 창</option>
+                                          <option value="WS_MODE">웹소켓 모드 전환</option>
+                                          <option value="SCREENSHOT_MODE">스크린샷 모드 전환</option>
+                                          <option value="CLOSE">종료 (닫기)</option>
+                                      </select>
+                                  </div>
+                                  <div class="col-md-4">
+                                      <label for="newCommandDesc" class="form-label" data-i18n="modal.voice.desc">설명
+                                          (선택)</label>
+                                      <input type="text" class="form-control" id="newCommandDesc" placeholder="설명">
+                                  </div>
+                                  <div class="col-12 text-end">
+                                      <button type="button" class="btn btn-secondary btn-sm"
+                                          onclick="hideAddCommandForm()" data-i18n="modal.voice.cancel">취소</button>
+                                      <button type="button" class="btn btn-success btn-sm" onclick="addCustomCommand()"
+                                          data-i18n="modal.voice.add">추가</button>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <!-- 목록 테이블 -->
+                          <div class="table-responsive">
+                              <table class="table table-hover">
+                                  <thead>
+                                      <tr>
+                                          <th data-i18n="modal.voice.table.phrase">명령어</th>
+                                          <th data-i18n="modal.voice.table.action">동작</th>
+                                          <th data-i18n="modal.voice.table.desc">설명</th>
+                                          <th style="width: 80px;" data-i18n="modal.voice.table.manage">관리</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody id="customCommandsTableBody">
+                                      <!-- JS로 로드됨 -->
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+  <!-- Socket.IO 클라이언트 라이브러리 -->
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+
+  <!-- Server Configuration Script -->
+  <script src="js/config.js"></script>
+
+  <!-- External JavaScript modules -->
+  <script src="js/auth-utils.js"></script>
+  <script src="js/coordinate-utils.js"></script>
+  <script src="js/text-input-utils.js"></script>
+  <script src="js/screenshot-core.js"></script>
+  <script src="js/screenshot-modals.js"></script>
+  <script src="js/screenshot-interactions.js"></script>
+  <script src="js/click-recorder.js"></script>
+  <script>
+    try {
+      // console.log('bootstrap: click-recorder.js loaded, initGlobalRecorderButtons=', typeof initGlobalRecorderButtons);
+      if (typeof initGlobalRecorderButtons === 'function') initGlobalRecorderButtons();
+    } catch (e) { console.log('bootstrap error', e); }
+  </script>
+  <script src="js/screenshot-utils.js"></script>
+  <script src="js/screenshot-voice.js"></script>
+  <script src="js/mouse-mode.js"></script>
+
+  <!-- 모드 관리자 -->
+  <script src="js/mode-manager.js"></script>
+
+  <!-- WebSocket 화면인식 모듈 -->
+  <script src="js/websocket-screenshot.js"></script>
+  <script src="js/websocket-utils.js"></script>
+
+  <!-- JavaScript 라이브러리들 -->
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
+  <script src="js/speech-to-text.js"></script>
+  <script src="js/history-api.js"></script>
+  <script src="js/voice-activation.js"></script>
+  <script src="js/voice-activation-integration.js"></script>
+  <script src="js/i18n.js"></script>
+
+  <!-- Voice Settings Modal Script -->
+  <script>
+      let modalVoiceCommands = [];
+
+      function showVoiceSettingsModal() {
+          const modal = new bootstrap.Modal(document.getElementById('voiceSettingsModal'));
+          modal.show();
+          loadVoiceSettings();
+      }
+
+      async function loadVoiceSettings() {
+          try {
+              // Load Basic Settings
+              const settingsRes = await fetch(AppConfig.getApiUrl('/api/settings'));
+              const settingsData = await settingsRes.json();
+              if (settingsData.triggerPhrase) {
+                  document.getElementById('triggerPhraseInput').value = settingsData.triggerPhrase;
+              }
+              if (settingsData.timeout) {
+                  document.getElementById('timeoutInput').value = settingsData.timeout;
+              }
+
+              // Load Commands
+              const cmdsRes = await fetch(AppConfig.getApiUrl('/api/voice-commands'));
+              const cmdsData = await cmdsRes.json();
+              modalVoiceCommands = cmdsData.commands || [];
+              renderVoiceCommands();
+
+          } catch (e) {
+              console.error('설정 로드 실패:', e);
+              showToast('설정 로드 실패', 'error');
+          }
+      }
+
+      async function saveBasicSettings() {
+          const phrase = document.getElementById('triggerPhraseInput').value.trim();
+          const timeout = document.getElementById('timeoutInput').value;
+
+          if (!phrase) {
+              showToast(typeof t === 'function' ? t('msg.input_trigger') : '호출어를 입력해주세요', 'warning');
+              return;
+          }
+
+          try {
+              const res = await fetch(AppConfig.getApiUrl('/api/settings'), {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      triggerPhrase: phrase,
+                      timeout: timeout
+                  })
+              });
+              const data = await res.json();
+              if (data.success) {
+                  showToast(typeof t === 'function' ? t('msg.basic_settings_saved') : '기본 설정이 저장되었습니다.', 'success');
+                  if (window.globalVoiceActivation) {
+                      window.globalVoiceActivation.triggerPhrase = phrase;
+                      if (timeout) window.globalVoiceActivation.commandTimeout = parseInt(timeout) * 1000;
+                  }
+              } else {
+                  showToast(typeof t === 'function' ? t('msg.save_fail') : '저장 실패', 'error');
+              }
+          } catch (e) {
+              console.error('저장 오류:', e);
+              showToast(typeof t === 'function' ? t('msg.error') : '저장 중 오류 발생', 'error');
+          }
+      }
+
+      function renderVoiceCommands() {
+          const tbody = document.getElementById('customCommandsTableBody');
+          tbody.innerHTML = '';
+
+          const actionLabels = {
+              'SCREENSHOT': typeof t === 'function' ? t('action.screenshot') : '스크린샷 촬영',
+              'REFRESH': typeof t === 'function' ? t('action.refresh') : '새로고침',
+              'ZOOM_IN': typeof t === 'function' ? t('action.zoom_in') : '확대',
+              'ZOOM_OUT': typeof t === 'function' ? t('action.zoom_out') : '축소',
+              'ZOOM_RESET': typeof t === 'function' ? t('action.zoom_reset') : '줌 초기화',
+              'TEXT_MODAL': typeof t === 'function' ? t('action.text_modal') : '텍스트 입력 창',
+              'HISTORY_MODAL': typeof t === 'function' ? t('action.history_modal') : '히스토리 창',
+              'DEBUG_MODAL': typeof t === 'function' ? t('action.debug_modal') : '설정/디버그 창',
+              'CLICK_RECORDER': typeof t === 'function' ? t('action.macro_recorder') : '매크로 기록 창',
+              'WS_MODE': typeof t === 'function' ? t('action.ws_mode') : '웹소켓 모드 전환',
+              'SCREENSHOT_MODE': typeof t === 'function' ? t('action.screenshot_mode') : '스크린샷 모드 전환',
+              'CLOSE': typeof t === 'function' ? t('action.close') : '종료 (닫기)'
+          };
+
+          if (modalVoiceCommands.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">등록된 커스텀 명령어가 없습니다.</td></tr>';
+              return;
+          }
+
+          modalVoiceCommands.forEach(cmd => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+          <td><span class="badge bg-light text-dark border">${cmd.phrase}</span></td>
+          <td>${actionLabels[cmd.action] || cmd.action}</td>
+          <td>${cmd.description || '-'}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteCustomCommand(${cmd.id})">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        `;
+              tbody.appendChild(tr);
+          });
+      }
+
+      function showAddCommandForm() {
+          document.getElementById('addCommandForm').style.display = 'block';
+      }
+
+      function hideAddCommandForm() {
+          document.getElementById('addCommandForm').style.display = 'none';
+          document.getElementById('newCommandPhrase').value = '';
+          document.getElementById('newCommandDesc').value = '';
+          document.getElementById('newCommandAction').value = 'SCREENSHOT';
+      }
+
+      async function addCustomCommand() {
+          const phrase = document.getElementById('newCommandPhrase').value.trim();
+          const action = document.getElementById('newCommandAction').value;
+          const desc = document.getElementById('newCommandDesc').value.trim();
+
+          if (!phrase) {
+              showToast(typeof t === 'function' ? t('msg.input_phrase') : '명령어를 입력해주세요', 'warning');
+              return;
+          }
+
+          try {
+              const res = await fetch(AppConfig.getApiUrl('/api/voice-commands'), {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ phrase, action, description: desc })
+              });
+              const data = await res.json();
+              if (data.success) {
+                  showToast(typeof t === 'function' ? t('msg.command_added') : '명령어가 추가되었습니다', 'success');
+                  hideAddCommandForm();
+                  loadVoiceSettings(); // Reload list
+                  if (window.loadVoiceIntegrationSettings) window.loadVoiceIntegrationSettings();
+              } else {
+                  showToast('추가 실패: ' + (data.error || '알 수 없는 오류'), 'error');
+              }
+          } catch (e) {
+              console.error('추가 오류:', e);
+              showToast(typeof t === 'function' ? t('msg.error') : '추가 중 오류 발생', 'error');
+          }
+      }
+
+      async function deleteCustomCommand(id) {
+          if (!confirm(typeof t === 'function' ? t('msg.confirm_delete') : '정말 삭제하시겠습니까?')) return;
+
+          try {
+              const res = await fetch(AppConfig.getApiUrl(`/api/voice-commands/${id}`), {
+                  method: 'DELETE'
+              });
+              const data = await res.json();
+              if (data.success) {
+                  showToast(typeof t === 'function' ? t('msg.command_deleted') : '삭제되었습니다', 'success');
+                  loadVoiceSettings();
+                  if (window.loadVoiceIntegrationSettings) window.loadVoiceIntegrationSettings();
+              } else {
+                  showToast('삭제 실패', 'error');
+              }
+          } catch (e) {
+              console.error('삭제 오류:', e);
+              showToast(typeof t === 'function' ? t('msg.error') : '삭제 중 오류 발생', 'error');
+          }
+      }
+  </script>
+
+  <!-- Server Config Modal Script -->
+  <script>
+    function showServerConfigModal() {
+      const modal = new bootstrap.Modal(document.getElementById('serverConfigModal'));
+      const input = document.getElementById('serverUrlInput');
+      const currentUrl = document.getElementById('currentServerUrl');
+
+      // Show current server URL
+      input.value = AppConfig.getServerUrl();
+      currentUrl.textContent = AppConfig.getServerUrl() || '미설정';
+
+      modal.show();
+    }
+
+    async function saveServerConfig() {
+      const input = document.getElementById('serverUrlInput');
+      const statusDiv = document.getElementById('serverStatus');
+      const url = input.value.trim();
+
+      if (!url) {
+        statusDiv.className = 'alert alert-danger';
+        statusDiv.textContent = '서버 URL을 입력하세요';
+        statusDiv.style.display = 'block';
+        return;
+      }
+
+      // Save URL
+      if (!AppConfig.setServerUrl(url)) {
+        statusDiv.className = 'alert alert-danger';
+        statusDiv.textContent = '올바른 URL 형식이 아닙니다';
+        statusDiv.style.display = 'block';
+        return;
+      }
+
+      // Test connection
+      statusDiv.className = 'alert alert-info';
+      statusDiv.textContent = '서버 연결 테스트 중...';
+      statusDiv.style.display = 'block';
+
+      const isConnected = await AppConfig.testConnection();
+
+      if (isConnected) {
+        statusDiv.className = 'alert alert-success';
+        statusDiv.textContent = '✓ 서버 연결 성공! 설정이 저장되었습니다.';
+        document.getElementById('currentServerUrl').textContent = url;
+
+        // Auto close after 2 seconds
+        setTimeout(() => {
+          bootstrap.Modal.getInstance(document.getElementById('serverConfigModal')).hide();
+        }, 2000);
+      } else {
+        statusDiv.className = 'alert alert-warning';
+        statusDiv.textContent = '⚠ 서버에 연결할 수 없습니다. URL이 저장되었지만 서버가 응답하지 않습니다.';
+      }
+    }
+
+    // Show server config modal if no server URL is set
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!localStorage.getItem('serverUrl')) {
+        setTimeout(() => {
+          showServerConfigModal();
+        }, 1000);
+      }
+    });
+  </script>
+
+  <!-- 인증 처리 제거 (GitHub Pages에서는 인증 불필요) -->
+  <script>
+    // 페이지 로드 시 작업 (인증 체크 제거)
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('Voice Coding Client - GitHub Pages Version');
+      console.log('Server URL:', AppConfig.getServerUrl());
+    });
+  </script>
+
+  <!-- Bootstrap Bundle with Popper (Required for Dropdowns) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
