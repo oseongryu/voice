@@ -35,35 +35,166 @@ const AppConfig = {
     }
   },
 
-  // ===== API 서버 URL =====
+  // ===== API 서버 관리 (N개 동적 지원) =====
+
+  // 저장된 서버 목록 가져오기
+  getApiServers() {
+    try {
+      const data = localStorage.getItem('apiServers');
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error('Failed to parse apiServers:', e);
+      return [];
+    }
+  },
+
+  // 서버 목록 저장
+  setApiServers(servers) {
+    localStorage.setItem('apiServers', JSON.stringify(servers));
+  },
+
+  // 서버 추가
+  addApiServer(name = null) {
+    const servers = this.getApiServers();
+    const newId = servers.length > 0 ? Math.max(...servers.map(s => s.id)) + 1 : 1;
+    const newServer = {
+      id: newId,
+      name: name || `API 서버 ${newId}`,
+      url: '',
+      token: null
+    };
+    servers.push(newServer);
+    this.setApiServers(servers);
+    console.log('API 서버 추가됨:', newServer);
+    return newServer;
+  },
+
+  // 서버 삭제
+  removeApiServer(serverId) {
+    let servers = this.getApiServers();
+    servers = servers.filter(s => s.id !== serverId);
+    this.setApiServers(servers);
+
+    // 삭제된 서버가 활성 서버였다면 첫 번째 서버로 변경
+    if (this.getActiveApiServer() === serverId && servers.length > 0) {
+      this.setActiveApiServer(servers[0].id);
+    }
+    console.log('API 서버 삭제됨:', serverId);
+    return true;
+  },
+
+  // 특정 서버 가져오기
+  getApiServerById(serverId) {
+    const servers = this.getApiServers();
+    return servers.find(s => s.id === serverId) || null;
+  },
+
+  // 서버 정보 업데이트
+  updateApiServer(serverId, updates) {
+    const servers = this.getApiServers();
+    const index = servers.findIndex(s => s.id === serverId);
+    if (index >= 0) {
+      servers[index] = { ...servers[index], ...updates };
+      this.setApiServers(servers);
+      console.log('API 서버 업데이트:', servers[index]);
+      return true;
+    }
+    return false;
+  },
+
+  // 서버 URL 설정
+  setApiServerUrl(serverId, url) {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return this.updateApiServer(serverId, { url: url.replace(/\/$/, '') });
+    } catch (e) {
+      console.error('Invalid API server URL:', url);
+      return false;
+    }
+  },
+
+  // 서버 토큰 설정
+  setApiServerToken(serverId, token) {
+    return this.updateApiServer(serverId, { token });
+  },
+
+  // 서버 토큰 가져오기
+  getApiServerToken(serverId) {
+    const server = this.getApiServerById(serverId);
+    return server ? server.token : null;
+  },
+
+  // 현재 활성화된 API 서버 ID
+  getActiveApiServer() {
+    const id = parseInt(localStorage.getItem('activeApiServer') || '0', 10);
+    const servers = this.getApiServers();
+    // 유효한 ID인지 확인
+    if (servers.some(s => s.id === id)) {
+      return id;
+    }
+    // 없으면 첫 번째 서버 반환
+    return servers.length > 0 ? servers[0].id : 0;
+  },
+
+  setActiveApiServer(serverId) {
+    localStorage.setItem('activeApiServer', serverId.toString());
+    console.log('Active API server changed to:', serverId);
+    return true;
+  },
+
+  // 활성 서버의 토큰 가져오기
+  getActiveApiServerToken() {
+    return this.getApiServerToken(this.getActiveApiServer());
+  },
+
+  // 활성 서버의 토큰 설정
+  setActiveApiServerToken(token) {
+    return this.setApiServerToken(this.getActiveApiServer(), token);
+  },
+
+  // 현재 활성 API 서버 URL 가져오기
   get API_SERVER_URL() {
-    return localStorage.getItem('apiServerUrl') || 'https://127.0.0.1:8000';
+    const server = this.getApiServerById(this.getActiveApiServer());
+    return server ? server.url : 'https://127.0.0.1:8000';
   },
 
   set API_SERVER_URL(url) {
-    localStorage.setItem('apiServerUrl', url);
+    this.setApiServerUrl(this.getActiveApiServer(), url);
   },
 
   getApiServerUrl() {
     return this.API_SERVER_URL.replace(/\/$/, '');
   },
 
-  setApiServerUrl(url) {
+  // 하위 호환성: 활성 서버 URL 설정
+  setApiServerUrlCompat(url) {
     if (!url) {
       console.error('API server URL cannot be empty');
       return false;
     }
-
     try {
       new URL(url);
-      this.API_SERVER_URL = url.replace(/\/$/, '');
-      console.log('API server URL updated:', this.API_SERVER_URL);
+      const activeId = this.getActiveApiServer();
+      if (activeId) {
+        this.updateApiServer(activeId, { url: url.replace(/\/$/, '') });
+      }
+      console.log('API server URL updated:', url);
       return true;
     } catch (e) {
       console.error('Invalid API server URL:', url);
       return false;
     }
   },
+
+  // 초기화: 서버가 없으면 기본 서버 1개 생성
+  initApiServers() {
+    const servers = this.getApiServers();
+    if (servers.length === 0) {
+      this.addApiServer('API 서버 1');
+    }
+  },
+
 
   // ===== 로그인 엔드포인트 생성 (인증, 2FA 등) =====
   getLoginUrl(endpoint) {

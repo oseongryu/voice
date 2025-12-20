@@ -82,21 +82,27 @@
             </button>
           </li>
 
-          <!-- Tools Dropdown -->
+          <!-- User Account Dropdown -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown"
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
               aria-expanded="false">
-              <i class="bi bi-tools"></i> <span data-i18n="nav.tools">도구</span>
+              <i class="bi bi-person-circle"></i> <span id="currentUsername">사용자</span>
             </a>
-            <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
-                <button class="dropdown-item" onclick="showServerConfigModal()">
-                  <i class="bi bi-hdd-network"></i> <span>API 서버 연결</span>
-                </button>
+                <hr class="dropdown-divider">
               </li>
               <li>
                 <button class="dropdown-item" onclick="showSettingModal()">
                   <i class="bi bi-gear"></i> <span data-i18n="nav.tools.debug">설정</span>
+                </button>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <button class="dropdown-item" onclick="showServerConfigModal()">
+                  <i class="bi bi-hdd-network"></i> <span>API 서버 연결</span>
                 </button>
               </li>
               <li>
@@ -114,23 +120,6 @@
                 <button class="dropdown-item" onclick="showVoiceHistoryModal()">
                   <i class="bi bi-journal-text"></i><span data-i18n="nav.tools.history">음성 히스토리</span>
                 </button>
-              </li>
-            </ul>
-          </li>
-          <!-- User Account Dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              <i class="bi bi-person-circle"></i> <span id="currentUsername">사용자</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-              <li>
-                <h6 class="dropdown-header">
-                  <i class="bi bi-person-badge"></i> 계정
-                </h6>
-              </li>
-              <li>
-                <hr class="dropdown-divider">
               </li>
               <li>
                 <button class="dropdown-item" onclick="show2FASettingsModal()">

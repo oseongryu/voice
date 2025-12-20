@@ -176,11 +176,13 @@ function clearLoginToken() {
 }
 
 /**
- * API 토큰 삭제 (하위 호환성 - 통합 토큰 삭제)
+ * API 토큰 삭제 (하위 호환성 - 통합 토큰에서는 아무 동작 안함)
+ * @deprecated With unified token, API auth failure should not clear login token
  */
 function clearApiToken(serverUrl) {
-  console.warn('clearApiToken() is deprecated. Use clearStoredToken() instead.');
-  clearStoredToken();
+  console.warn('clearApiToken() is deprecated. API auth status is managed within the unified token.');
+  // 주의: 통합 토큰 아키텍처에서는 API 인증 실패가 로그인 토큰을 삭제하지 않음
+  // clearStoredToken()을 호출하지 않음
 }
 
 /**
@@ -339,6 +341,8 @@ async function performLogin(username, password, totpCode = null, backupCode = nu
 
     if (response.ok && result.success && result.token) {
       setToken(result.token);
+      // 로그인 기본 토큰 별도 저장 (다른 서버 인증 시 사용)
+      localStorage.setItem('baseLoginToken', result.token);
       scheduleTokenRefresh(result.token);
       return {
         success: true,
@@ -366,21 +370,32 @@ async function performLogin(username, password, totpCode = null, backupCode = nu
  * API 인증 수행
  * @param {string} apiUsername - API 사용자명
  * @param {string} apiPassword - API 비밀번호
+ * @param {boolean} forceReauth - 강제 재인증 여부 (다른 서버로 전환 시 사용)
  * @returns {Promise<Object>} API 인증 결과
  */
-async function performSecondFactorAuth(apiUsername, apiPassword) {
+async function performSecondFactorAuth(apiUsername, apiPassword, forceReauth = false) {
   if (!apiUsername || !apiPassword) {
     return { success: false, error: 'API 사용자명과 비밀번호를 입력해주세요' };
   }
 
   try {
-    const currentToken = getToken();
-    if (!currentToken) {
+    let tokenToUse = getToken();
+
+    // 강제 재인증 시 기본 로그인 토큰 사용 (다른 서버 인증용)
+    if (forceReauth) {
+      const baseLoginToken = localStorage.getItem('baseLoginToken');
+      if (baseLoginToken) {
+        tokenToUse = baseLoginToken;
+        console.log('다른 서버 인증을 위해 기본 로그인 토큰 사용');
+      }
+    }
+
+    if (!tokenToUse) {
       return { success: false, error: '로그인이 필요합니다. 먼저 로그인하세요.' };
     }
 
-    // 이미 API 인증 완료된 경우
-    if (!requiresSecondAuth()) {
+    // 이미 API 인증 완료된 경우 (강제 재인증이 아닌 경우에만 체크)
+    if (!forceReauth && !requiresSecondAuth()) {
       return { success: false, error: '이미 API 인증이 완료되었습니다.' };
     }
 
@@ -388,45 +403,66 @@ async function performSecondFactorAuth(apiUsername, apiPassword) {
       ? AppConfig.getApiUrl(AUTH_CONFIG.SECOND_FACTOR_URL)
       : AUTH_CONFIG.SECOND_FACTOR_URL;
 
-    const response = await fetch(secondFactorUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentToken}`
-      },
-      body: JSON.stringify({
-        api_username: apiUsername,
-        api_password: apiPassword
-      })
-    });
+    // 타임아웃 설정 (10초)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const result = await response.json();
+    try {
+      const response = await fetch(secondFactorUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenToUse}`
+        },
+        body: JSON.stringify({
+          api_username: apiUsername,
+          api_password: apiPassword
+        }),
+        signal: controller.signal
+      });
 
-    if (response.ok && result.success && result.token) {
-      // 새로운 auth_level=2 토큰 저장
-      setToken(result.token);
-      scheduleTokenRefresh(result.token);
+      clearTimeout(timeoutId);
 
-      console.log('API 인증 성공:', result);
+      const result = await response.json();
 
-      return {
-        success: true,
-        token: result.token,
-        user: result.user,
-        auth_level: result.auth_level || 2,
-        api_authenticated: true
-      };
-    } else {
-      return {
-        success: false,
-        error: result.message || 'API 인증에 실패했습니다'
-      };
+      if (response.ok && result.success && result.token) {
+        // 새로운 auth_level=2 토큰 저장
+        setToken(result.token);
+        scheduleTokenRefresh(result.token);
+
+        console.log('API 인증 성공:', result);
+
+        return {
+          success: true,
+          token: result.token,
+          user: result.user,
+          auth_level: result.auth_level || 2,
+          api_authenticated: true
+        };
+      } else {
+        return {
+          success: false,
+          error: result.message || 'API 인증에 실패했습니다'
+        };
+      }
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        console.error('API 인증 요청 타임아웃');
+        return {
+          success: false,
+          error: '서버 응답 시간 초과 (10초). 서버 URL을 확인하세요.'
+        };
+      }
+      throw fetchError;  // 다른 에러는 상위 catch로 전달
     }
   } catch (error) {
     console.error('API 인증 요청 실패:', error);
     return {
       success: false,
-      error: '서버 연결에 실패했습니다'
+      error: error.message === 'Failed to fetch'
+        ? '서버에 연결할 수 없습니다. URL과 서버 상태를 확인하세요.'
+        : '서버 연결에 실패했습니다'
     };
   }
 }
@@ -447,8 +483,25 @@ async function performLogout(redirectToLogin = true) {
 
     // 로컬 토큰 삭제 (서버 로그아웃 API 없음)
 
-    // 로컬 토큰 삭제
+    // 메인 토큰 삭제
     clearStoredToken();
+
+    // API 서버별 토큰 삭제 (URL은 유지) - 동적 서버 구조
+    if (typeof AppConfig !== 'undefined') {
+      const servers = AppConfig.getApiServers();
+      const clearedServers = servers.map(server => ({
+        ...server,
+        token: null  // 토큰만 삭제, URL은 유지
+      }));
+      AppConfig.setApiServers(clearedServers);
+    }
+
+    // 기본 로그인 토큰 삭제
+    localStorage.removeItem('baseLoginToken');
+
+    // 활성 서버 정보 삭제
+    localStorage.removeItem('activeApiServer');
+    console.log('모든 인증 토큰 삭제됨 (URL은 유지)');
 
     // 로그인 모달 표시 (리다이렉트 대신)
     if (redirectToLogin && typeof window !== 'undefined') {
@@ -491,6 +544,12 @@ function handle401Error(response = null, context = '') {
     return;
   }
 
+  // API 인증(second-factor) 요청의 401은 무시 (잘못된 API 자격증명)
+  if (context && context.includes('/api/auth/second-factor')) {
+    console.log('API 인증 요청 실패 - 로그인 상태 유지');
+    return;
+  }
+
   // 토큰 삭제 (토큰이 만료되었거나 유효하지 않음)
   // 하지만 API 서버 401은 loginToken을 삭제하지 않음
   const url = context ? context.replace('global fetch ', '') : '';
@@ -499,31 +558,27 @@ function handle401Error(response = null, context = '') {
     url.startsWith(AppConfig.getApiServerUrl());
 
   if (isApiServerRequest) {
-    // API 서버 401 - API 토큰만 삭제
-    console.log('API 서버 인증 실패 - API 토큰만 삭제');
-    if (typeof AppConfig !== 'undefined') {
-      const apiServerUrl = AppConfig.getApiServerUrl();
-      if (typeof window.AuthUtils !== 'undefined' && window.AuthUtils.clearApiToken) {
-        window.AuthUtils.clearApiToken(apiServerUrl);
-      }
+    // API 서버 401 - 토스트 메시지만 표시, 토큰은 삭제하지 않음
+    console.log('API 서버 인증 실패 - 로그인 상태 유지, API 인증만 필요');
+    // 토스트 메시지 표시
+    if (typeof showToast === 'function') {
+      showToast('🔐 API 인증이 필요합니다.', 'warning', 3000);
+    }
+    // API 인증 모달 표시
+    if (typeof showServerConfigModal === 'function') {
+      setTimeout(() => showServerConfigModal(), 500);
     }
   } else {
     // 로그인 서버 401 - 로그인 토큰 삭제
     console.log('로그인 서버 인증 실패 - 로그인 토큰 삭제');
     clearLoginToken();
-  }
 
-  // 토스트 메시지 표시 (있다면)
-  if (typeof showToast === 'function') {
-    if (isApiServerRequest) {
-      showToast('🔐 API 서버 연결이 만료되었습니다.', 'warning', 3000);
-    } else {
+    // 토스트 메시지 표시 (있다면)
+    if (typeof showToast === 'function') {
       showToast('🔐 세션이 만료되었습니다. 다시 로그인해주세요.', 'warning', 3000);
     }
-  }
 
-  // 로그인 모달 표시 (로그인 서버만)
-  if (!isApiServerRequest) {
+    // 로그인 모달 표시
     if (typeof showLoginModal === 'function') {
       showLoginModal();
     } else {
@@ -756,10 +811,11 @@ function setupGlobalFetchWrapper() {
       .then(response => {
         // 401 오류 처리 (인증 실패)
         if (response.status === 401 && !isLogoutInProgress) {
-          // 로그인 요청 자체의 401은 무시 (잘못된 자격증명 - 호출자가 처리)
+          // 로그인/API인증 요청 자체의 401은 무시 (잘못된 자격증명 - 호출자가 처리)
           const isLoginRequest = url.includes('/api/auth/login');
+          const isSecondFactorRequest = url.includes('/api/auth/second-factor');
 
-          if (!isLoginRequest) {
+          if (!isLoginRequest && !isSecondFactorRequest) {
             // 로그인 모달 표시
             handle401Error(response, `global fetch ${url}`);
           }

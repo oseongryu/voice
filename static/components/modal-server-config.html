@@ -10,6 +10,26 @@
             </div>
             <div class="modal-body">
 
+                <!-- API 서버 선택 + 추가/삭제 -->
+                <div class="mb-3">
+                    <label for="apiServerSelect" class="form-label">
+                        <i class="bi bi-hdd-stack"></i> API 서버 선택
+                    </label>
+                    <div class="input-group">
+                        <select class="form-select" id="apiServerSelect" onchange="onApiServerSelectionChange()">
+                            <!-- 동적으로 생성됨 -->
+                        </select>
+                        <button class="btn btn-outline-success" type="button" onclick="addNewApiServer()" title="서버 추가">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" type="button" onclick="removeCurrentApiServer()"
+                            title="현재 서버 삭제">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- API 서버 URL (항상 표시) -->
                 <div class="mb-3">
                     <label for="apiServerUrl" class="form-label">
                         <i class="bi bi-server"></i> API 서버 URL
@@ -18,43 +38,53 @@
                         autocomplete="url">
                 </div>
 
-                <div class="mb-3">
-                    <label for="serverUsername" class="form-label">
-                        <i class="bi bi-person"></i> API 사용자명
-                    </label>
-                    <input type="text" class="form-control" id="serverUsername" placeholder="API 사용자명 입력"
-                        autocomplete="username">
+                <!-- 인증 입력 폼 (미인증 시 표시) -->
+                <div id="apiAuthForm">
+                    <div class="mb-3">
+                        <label for="serverUsername" class="form-label">
+                            <i class="bi bi-person"></i> API 사용자명
+                        </label>
+                        <input type="text" class="form-control" id="serverUsername" placeholder="API 사용자명 입력"
+                            autocomplete="username">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="serverPassword" class="form-label">
+                            <i class="bi bi-key"></i> API 비밀번호
+                        </label>
+                        <input type="password" class="form-control" id="serverPassword" placeholder="API 비밀번호 입력"
+                            autocomplete="current-password">
+                    </div>
+
+                    <div id="serverStatus" class="alert" style="display: none;"></div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="saveServerConfig()">
+                            <i class="bi bi-shield-check"></i> API 인증
+                        </button>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="serverPassword" class="form-label">
-                        <i class="bi bi-key"></i> API 비밀번호
-                    </label>
-                    <input type="password" class="form-control" id="serverPassword" placeholder="API 비밀번호 입력"
-                        autocomplete="current-password">
-                </div>
-
-                <div id="serverStatus" class="alert" style="display: none;"></div>
-
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary" onclick="saveServerConfig()">
-                        <i class="bi bi-shield-check"></i> API 인증 진행
-                    </button>
+                <!-- 인증 완료 메시지 (인증 시 표시) -->
+                <div id="apiAuthComplete" class="text-center text-success py-2" style="display: none;">
+                    <i class="bi bi-check-circle-fill"></i> 인증됨
                 </div>
 
                 <hr>
 
-                <div class="mb-2">
-                    <strong>현재 인증 상태:</strong>
+                <!-- 서버 목록 및 인증 상태 (동적 생성) -->
+                <div class="mb-2 d-flex justify-content-between align-items-center">
+                    <strong>서버 목록:</strong>
+                    <small class="text-muted" id="serverCount">0개</small>
                 </div>
-                <div class="mb-3">
-                    <span class="badge bg-warning" id="authLevelBadge">로그인 완료 (API 미인증)</span>
+                <div id="serverStatusList" class="mb-3" style="max-height: 150px; overflow-y: auto;">
+                    <!-- 동적으로 생성됨 -->
                 </div>
 
-                <div class="d-grid">
-                    <button class="btn btn-outline-warning btn-sm" onclick="resetApiAuthentication()">
-                        <i class="bi bi-shield-x"></i> API 인증 해제
-                    </button>
+                <div class="mb-3">
+                    <strong>현재 활성:</strong>
+                    <span class="badge bg-warning" id="authLevelBadge">로그인 완료 (API 미인증)</span>
+                    <span class="badge bg-primary ms-1" id="activeServerBadge" style="display: none;"></span>
                 </div>
             </div>
         </div>
