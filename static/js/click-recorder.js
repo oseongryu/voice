@@ -302,7 +302,7 @@ function deleteSelectedRecording() {
 // --- Group persistence functions (server-backed) ---
 async function refreshSavedGroups() {
   try {
-    const res = await fetch('/api/click-groups');
+    const res = await fetch(AppConfig.getApiUrl('/api/click-groups'));
     const data = await res.json();
     const sel = document.getElementById('savedGroupsSelect');
     if (!sel) return;
@@ -324,7 +324,7 @@ async function saveCurrentGroup() {
   if (clickRecording.length === 0) { showToast('저장할 이벤트가 없습니다', 'error'); return; }
   try {
     // assume currentScreenshot exists and has screen_width/height
-    const res = await fetch('/api/click-groups', {
+    const res = await fetch(AppConfig.getApiUrl('/api/click-groups'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, events: clickRecording, ref_width: currentScreenshot.screen_width, ref_height: currentScreenshot.screen_height })
     });
@@ -343,7 +343,7 @@ async function loadSelectedGroup() {
   const sel = document.getElementById('savedGroupsSelect');
   if (!sel || !sel.value) return showToast('불러올 그룹을 선택하세요', 'error');
   try {
-    const res = await fetch(`/api/click-groups/${sel.value}`);
+    const res = await fetch(AppConfig.getApiUrl(`/api/click-groups/${sel.value}`));
     if (!res.ok) throw new Error('load failed');
     const data = await res.json();
     // store original reference size with the local recording for playback scaling
@@ -364,7 +364,7 @@ async function deleteSelectedGroup() {
   if (!sel || !sel.value) return showToast('삭제할 그룹을 선택하세요', 'error');
   if (!confirm('선택한 그룹을 삭제하시겠습니까?')) return;
   try {
-    const res = await fetch(`/api/click-groups/${sel.value}`, { method: 'DELETE' });
+    const res = await fetch(AppConfig.getApiUrl(`/api/click-groups/${sel.value}`), { method: 'DELETE' });
     if (!res.ok) throw new Error('delete failed');
     showToast('그룹 삭제 완료', 'success');
     refreshSavedGroups();
@@ -378,7 +378,7 @@ async function runSelectedGroup() {
   const sel = document.getElementById('savedGroupsSelect');
   if (!sel || !sel.value) return showToast('실행할 그룹을 선택하세요', 'error');
   try {
-    const res = await fetch(`/api/click-groups/${sel.value}`);
+    const res = await fetch(AppConfig.getApiUrl(`/api/click-groups/${sel.value}`));
     if (!res.ok) throw new Error('load failed');
     const data = await res.json();
     // assume all fields present

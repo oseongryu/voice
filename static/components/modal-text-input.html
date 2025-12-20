@@ -1,0 +1,129 @@
+<!-- 텍스트 입력 팝업 모달 (Bootstrap 5) -->
+<div class="modal fade" id="typeTextModal" tabindex="-1" aria-labelledby="typeTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="typeTextModalDialog">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+            <div class="modal-body p-4">
+                <!-- 입력 영역 -->
+                <div class="mb-3">
+                    <textarea id="textToType" class="form-control" rows="3" placeholder="여기에 입력하세요..."></textarea>
+                </div>
+
+                <!-- 메인 액션 버튼 -->
+                <div class="d-grid gap-2 mb-3">
+                    <div class="row g-2">
+                        <div class="col">
+                            <button class="btn btn-secondary w-100" data-bs-dismiss="modal"
+                                onclick="closeTypeTextModal()">
+                                취소
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-primary w-100 fw-bold" onclick="performTypeText()">
+                                전송
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="textModalVoiceBtn" class="btn btn-danger w-100"
+                                onclick="toggleTextModalRecording()">
+                                <i class="bi bi-mic-fill"></i> 녹음
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 특수 키 영역 (항상 표시) -->
+                <div class="mt-3" id="specialKeysArea">
+                    <div class="d-flex gap-3">
+                        <!-- 왼쪽: 특수키 영역 -->
+                        <div class="flex-grow-1">
+                            <!-- 첫 번째 줄: Esc(좌), 빈공간(중), Backspace(우) -->
+                            <div class="d-flex flex-wrap gap-1 mb-1">
+                                <button class="btn btn-light border btn-sm flex-fill"
+                                    onclick="performKeyPress('escape')">Esc</button>
+                                <button class="btn btn-light border btn-sm flex-fill"
+                                    style="visibility: hidden;">Del</button>
+                                <button class="btn btn-light border btn-sm flex-fill"
+                                    onclick="performKeyPress('backspace')" title="Backspace"><i
+                                        class="bi bi-backspace"></i></button>
+                            </div>
+                            <!-- 두 번째 줄: Tab(좌), Space(중), Enter(우) -->
+                            <div class="d-flex flex-wrap gap-1 mb-1">
+                                <button class="btn btn-light border btn-sm flex-fill"
+                                    onclick="performKeyPress('tab')">Tab</button>
+                                <button class="btn btn-light border btn-sm flex-fill"
+                                    onclick="performKeyPress('space')">Space</button>
+                                <button class="btn btn-light border btn-sm flex-fill"
+                                    onclick="performKeyPress('enter')">Enter</button>
+                            </div>
+                            <!-- 세 번째 줄: Ctrl 단축키 -->
+                            <div class="d-flex gap-1 mb-3">
+                                <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                                    onclick="performKeyCombination(['ctrl','c'])">Ctrl+C</button>
+                                <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                                    onclick="performKeyCombination(['ctrl','v'])">Ctrl+V</button>
+                                <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                                    onclick="performKeyCombination(['ctrl','a'])">Ctrl+A</button>
+                                <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                                    onclick="performKeyCombination(['ctrl','z'])">Ctrl+Z</button>
+                                <button class="btn btn-subtle-secondary btn-sm border flex-fill"
+                                    onclick="performKeyCombination(['ctrl','s'])">Ctrl+S</button>
+                            </div>
+
+                            <!-- 빈 공간 채우기 -->
+                            <div class="flex-grow-1 text-center text-muted small">
+                                <!-- 필요시 여기에 추가 설명이나 빈 공간 유지 -->
+                            </div>
+                        </div>
+
+                        <!-- 오른쪽: 네비게이션 및 화살표 영역 -->
+                        <div class="d-flex flex-column gap-2">
+                            <!-- 6키 클러스터 (Ins, Home, PgUp / Del, End, PgDn) -->
+                            <div class="d-flex flex-column gap-1">
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                                        onclick="performKeyPress('insert')">Ins</button>
+                                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                                        onclick="performKeyPress('home')">Home</button>
+                                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                                        onclick="performKeyPress('pageup')">PgUp</button>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                                        onclick="performKeyPress('delete')">Del</button>
+                                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                                        onclick="performKeyPress('end')">End</button>
+                                    <button class="btn btn-light border btn-sm" style="width: 45px;"
+                                        onclick="performKeyPress('pagedown')">PgDn</button>
+                                </div>
+                            </div>
+
+                            <!-- 화살표 키 -->
+                            <div class="d-flex flex-column gap-1 align-items-center mt-1">
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('up')"
+                                        style="width: 45px;">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('left')"
+                                        style="width: 45px;">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('down')"
+                                        style="width: 45px;">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="performKeyPress('right')"
+                                        style="width: 45px;">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

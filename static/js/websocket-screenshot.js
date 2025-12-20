@@ -64,8 +64,12 @@ function initializeWebSocket() {
 
 
     try {
+        // 서버 URL 가져오기
+        const serverUrl = AppConfig.getServerUrl();
+        console.log("WebSocket 연결 시도:", serverUrl);
+
         // Socket.IO 클라이언트 연결
-        socket = io({
+        socket = io(serverUrl, {
             transports: ['websocket', 'polling'],
             timeout: 20000,
             reconnection: true, // 자동 재연결 활성화

@@ -145,7 +145,7 @@ async function typeTextViaWebSocket(text, options = {}) {
  */
 async function typeTextViaHTTP(text, options = {}) {
   try {
-    const response = await fetch("/api/type_text", {
+    const response = await fetch(AppConfig.getApiUrl("/api/type_text"), {
       method: "POST",
       headers: createAuthHeaders(),
       body: JSON.stringify({ text: text }),
@@ -271,7 +271,7 @@ async function pressKeyViaWebSocket(key, options = {}) {
  */
 async function pressKeyViaHTTP(key, options = {}) {
   try {
-    const response = await fetch("/api/press_key", {
+    const response = await fetch(AppConfig.getApiUrl("/api/press_key"), {
       method: "POST",
       headers: createAuthHeaders(),
       body: JSON.stringify({ key: key }),
@@ -396,7 +396,7 @@ async function pressKeyCombinationViaWebSocket(keys, options = {}) {
  */
 async function pressKeyCombinationViaHTTP(keys, options = {}) {
   try {
-    const response = await fetch("/api/press_key_combination", {
+    const response = await fetch(AppConfig.getApiUrl("/api/press_key_combination"), {
       method: "POST",
       headers: createAuthHeaders(),
       body: JSON.stringify({ keys: keys }),

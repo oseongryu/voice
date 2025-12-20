@@ -19,13 +19,13 @@ class VoiceActivation {
     this.isSupported = false;
 
     // 이벤트 콜백
-    this.onActivationStart = options.onActivationStart || (() => {});
-    this.onActivationStop = options.onActivationStop || (() => {});
-    this.onTriggerDetected = options.onTriggerDetected || (() => {});
-    this.onCommandReceived = options.onCommandReceived || (() => {});
-    this.onCommandTimeout = options.onCommandTimeout || (() => {});
-    this.onError = options.onError || (() => {});
-    this.onPermissionDenied = options.onPermissionDenied || (() => {});
+    this.onActivationStart = options.onActivationStart || (() => { });
+    this.onActivationStop = options.onActivationStop || (() => { });
+    this.onTriggerDetected = options.onTriggerDetected || (() => { });
+    this.onCommandReceived = options.onCommandReceived || (() => { });
+    this.onCommandTimeout = options.onCommandTimeout || (() => { });
+    this.onError = options.onError || (() => { });
+    this.onPermissionDenied = options.onPermissionDenied || (() => { });
 
     this.init();
   }

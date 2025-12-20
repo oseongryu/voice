@@ -1,0 +1,62 @@
+<div class="modal fade" id="serverConfigModal" tabindex="-1" aria-labelledby="serverConfigModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serverConfigModalLabel">
+                    <i class="bi bi-shield-lock"></i> API 인증
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label for="apiServerUrl" class="form-label">
+                        <i class="bi bi-server"></i> API 서버 URL
+                    </label>
+                    <input type="text" class="form-control" id="apiServerUrl" placeholder="https://127.0.0.1:8000"
+                        autocomplete="url">
+                </div>
+
+                <div class="mb-3">
+                    <label for="serverUsername" class="form-label">
+                        <i class="bi bi-person"></i> API 사용자명
+                    </label>
+                    <input type="text" class="form-control" id="serverUsername" placeholder="API 사용자명 입력"
+                        autocomplete="username">
+                </div>
+
+                <div class="mb-3">
+                    <label for="serverPassword" class="form-label">
+                        <i class="bi bi-key"></i> API 비밀번호
+                    </label>
+                    <input type="password" class="form-control" id="serverPassword" placeholder="API 비밀번호 입력"
+                        autocomplete="current-password">
+                </div>
+
+                <div id="serverStatus" class="alert" style="display: none;"></div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="saveServerConfig()">
+                        <i class="bi bi-shield-check"></i> API 인증 진행
+                    </button>
+                </div>
+
+                <hr>
+
+                <div class="mb-2">
+                    <strong>현재 인증 상태:</strong>
+                </div>
+                <div class="mb-3">
+                    <span class="badge bg-warning" id="authLevelBadge">로그인 완료 (API 미인증)</span>
+                </div>
+
+                <div class="d-grid">
+                    <button class="btn btn-outline-warning btn-sm" onclick="resetApiAuthentication()">
+                        <i class="bi bi-shield-x"></i> API 인증 해제
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

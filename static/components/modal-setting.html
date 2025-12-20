@@ -1,0 +1,61 @@
+<!-- 디버그 팝업 모달 -> 설정 팝업 모달로 변경 -->
+<div class="modal fade" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 0.5rem 1rem;">
+                <h6 class="modal-title" id="settingModalLabel" style="font-size: 0.95rem;">⚙️ 설정</h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.8rem;"></button>
+            </div>
+            <div class="modal-body">
+
+
+                <!-- UI 설정 섹션 -->
+                <div class="debug-section mb-4">
+                    <h6 class="text-primary mb-2">⚙️ UI 설정</h6>
+                    <div class="mb-3">
+                        <label for="headerModeSelect" class="form-label">헤더 스타일 (Header Style):</label>
+                        <select id="headerModeSelect" class="form-select" onchange="changeHeaderMode(this.value)">
+                            <option value="normal">기본 (Normal)</option>
+                            <option value="fixed">상단 고정 (Sticky)</option>
+                            <option value="floating">플로팅 자동 숨김 (Floating)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="textModalPositionSelect" class="form-label">텍스트 입력 팝업 위치:</label>
+                        <select id="textModalPositionSelect" class="form-select"
+                            onchange="changeTextModalPosition(this.value)">
+                            <option value="top">상단</option>
+                            <option value="center">중앙</option>
+                            <option value="top-start">왼쪽 상단</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="screenshotDelayInput" class="form-label">스크린샷 갱신 지연시간 (ms):</label>
+                        <div class="input-group">
+                            <input type="number" id="screenshotDelayInput" class="form-control" value="1000" step="100"
+                                min="0" onchange="changeScreenshotDelay(this.value)">
+                            <span class="input-group-text">ms</span>
+                        </div>
+                        <div class="form-text" style="font-size: 0.8rem;">입력/클릭 후 화면 갱신까지의 대기 시간 (기본값: 1000ms)</div>
+                    </div>
+                </div>
+
+                <!-- 언어 설정 섹션 -->
+                <div class="debug-section mb-4">
+                    <h6 class="text-primary mb-2" data-i18n="settings.language">🌐 언어 설정</h6>
+                    <select id="languageSelect" class="form-select" onchange="setLanguage(this.value)">
+                        <option value="ko">🇰🇷 한국어</option>
+                        <option value="en">🇺🇸 English</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 0.5rem 1rem;">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetSettings()">
+                    <i class="bi bi-arrow-counterclockwise"></i> 설정 초기화
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>

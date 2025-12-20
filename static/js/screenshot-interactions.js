@@ -77,7 +77,7 @@ async function processHttpClickQueue() {
       }
     }
 
-    const response = await fetch("/api/click_position", {
+    const response = await fetch(AppConfig.getApiUrl("/api/click_position"), {
       method: "POST",
       headers: headers,
       body: JSON.stringify({

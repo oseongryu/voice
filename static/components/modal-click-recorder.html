@@ -1,0 +1,78 @@
+<!-- 좌표 녹화/재생 모달 (Bootstrap) -->
+<div class="modal fade" id="clickRecorderModal" tabindex="-1" aria-labelledby="clickRecorderModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 0.5rem 1rem;">
+                <h6 class="modal-title" id="clickRecorderModalLabel" style="font-size: 0.95rem;">📹 매크로 기록</h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.8rem;"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 녹화 컨트롤 -->
+                <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                    <button id="startRecordBtn" class="btn btn-primary btn-sm">녹화 시작</button>
+                    <button id="stopRecordBtn" class="btn btn-secondary btn-sm" style="display:none">녹화 중지</button>
+                    <button id="playbackBtn" class="btn btn-success btn-sm" disabled>재생</button>
+                    <button id="deleteSelectedRecordingBtn" class="btn btn-warning btn-sm">선택삭제</button>
+                    <button id="clearRecordingBtn" class="btn btn-outline-secondary btn-sm ms-auto">지우기</button>
+                </div>
+
+                <!-- 녹화 정보 -->
+                <div class="mb-3">
+                    <label class="form-label">녹화된 이벤트 수: <span id="recordCount"
+                            class="badge bg-secondary">0</span></label>
+                </div>
+
+                <!-- 재생 속도 -->
+                <div class="mb-3">
+                    <label for="playbackSpeed" class="form-label">재생 속도 (배율):</label>
+                    <select id="playbackSpeed" class="form-select form-select-sm" style="max-width: 150px;">
+                        <option value="1">1x</option>
+                        <option value="0.5">0.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                </div>
+
+                <!-- 이벤트 목록 -->
+                <div class="mb-3">
+                    <label for="recordList" class="form-label">이벤트 목록 (시간, 유형, x, y)</label>
+                    <textarea id="recordList" class="form-control font-monospace"
+                        style="height:160px; font-size:0.9rem;" readonly></textarea>
+                </div>
+
+                <!-- 내보내기/불러오기 -->
+                <div class="d-flex gap-2 mb-3">
+                    <button id="exportBtn" class="btn btn-outline-secondary btn-sm" disabled>내보내기 (JSON)</button>
+                    <button id="importBtn" class="btn btn-outline-secondary btn-sm ms-auto">불러오기</button>
+                    <input id="importFileInput" type="file" accept="application/json" style="display:none" />
+                </div>
+
+                <hr />
+
+                <!-- 그룹 저장 -->
+                <div class="d-flex gap-2 align-items-center mb-3">
+                    <input id="saveGroupName" class="form-control form-control-sm" placeholder="그룹 이름을 입력하세요" />
+                    <button id="saveGroupBtn" class="btn btn-primary btn-sm" disabled>저장</button>
+                </div>
+
+                <!-- 저장된 그룹 관리 -->
+                <div class="d-flex gap-2 align-items-center mb-3">
+                    <label class="form-label mb-0" style="white-space:nowrap">저장된 그룹:</label>
+                    <select id="savedGroupsSelect" class="form-select form-select-sm"></select>
+                    <button id="loadGroupBtn" class="btn btn-outline-secondary btn-sm">불러오기</button>
+                    <button id="deleteGroupBtn" class="btn btn-danger btn-sm">삭제</button>
+                    <button id="runGroupBtn" class="btn btn-success btn-sm">실행</button>
+                </div>
+
+                <!-- 사용법 안내 -->
+                <div class="alert alert-info mb-0" role="alert">
+                    <small>
+                        <strong>사용법:</strong> 모달을 연 상태에서 스크린샷 이미지 위를 클릭하면 클릭 이벤트가 녹화됩니다.
+                        재생 시 서버로 순차적으로 클릭 요청을 보냅니다.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

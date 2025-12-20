@@ -23,11 +23,11 @@ function initializeVoiceFeatures() {
   initializeVoiceSpeechToText();
   initializeVoiceHistoryAPI();
   initializeVoiceGrid();
-  
+
   // 텍스트 입력 이벤트 리스너
   const voiceTextInput = document.getElementById('voiceTextInput');
   if (voiceTextInput) {
-    voiceTextInput.addEventListener('keypress', function(e) {
+    voiceTextInput.addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
         addTextToVoiceHistory();
       }
@@ -131,13 +131,13 @@ function initializeVoiceGrid() {
       flex: 1,
       wrapText: true,
       autoHeight: true,
-      cellStyle: { 
+      cellStyle: {
         fontSize: '0.95rem',
         lineHeight: '1.4',
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-word'
       },
-      cellRenderer: function(params) {
+      cellRenderer: function (params) {
         const txt = params.data.text || '';
         return `<span title="${txt}">${txt}</span>`;
       }
@@ -172,7 +172,7 @@ function updateVoiceStatus(message, type = 'info') {
   if (statusDiv) {
     statusDiv.textContent = message;
     statusDiv.className = 'status-display';
-    
+
     if (type === 'error') {
       statusDiv.style.background = '#f8d7da';
       statusDiv.style.borderColor = '#f5c6cb';
@@ -229,7 +229,7 @@ async function copySelectedToServerClipboard() {
   try {
     const text = selectedRows.map(r => r.text || '').join('\n');
 
-    const resp = await fetch('/api/copy_to_server_clipboard', {
+    const resp = await fetch(AppConfig.getApiUrl('/api/copy_to_server_clipboard'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text })
@@ -276,12 +276,12 @@ function stopVoiceRecording() {
 function addTextToVoiceHistory() {
   const textInput = document.getElementById('voiceTextInput');
   const text = textInput.value.trim();
-  
+
   if (!text) {
     updateVoiceStatus('텍스트를 입력해주세요.', 'error');
     return;
   }
-  
+
   if (voiceHistoryAPI) {
     voiceHistoryAPI.addTextToHistory(text);
     textInput.value = '';
@@ -302,13 +302,13 @@ function selectAllVoiceHistory() {
 
 function deleteSelectedVoiceHistory() {
   if (!voiceGridApi) return;
-  
+
   const selectedRows = voiceGridApi.getSelectedRows();
   if (selectedRows.length === 0) {
     updateVoiceStatus('삭제할 항목을 선택해주세요.', 'error');
     return;
   }
-  
+
   if (confirm(`선택한 ${selectedRows.length}개 항목을 삭제하시겠습니까?`)) {
     const itemIds = selectedRows.map(row => row.id);
     if (voiceHistoryAPI) {
@@ -330,7 +330,7 @@ function exportVoiceHistory() {
     updateVoiceStatus('내보낼 히스토리가 없습니다.', 'error');
     return;
   }
-  
+
   if (voiceHistoryAPI) {
     try {
       voiceHistoryAPI.exportHistory(voiceServerHistory);

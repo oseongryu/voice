@@ -7,7 +7,7 @@ let currentLang = 'ko';
 
 async function setLanguage(lang) {
     try {
-        const response = await fetch(`/static/locales/${lang}.json`);
+        const response = await fetch(`static/locales/${lang}.json`);
         if (!response.ok) {
             throw new Error(`Failed to load language: ${lang}`);
         }

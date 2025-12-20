@@ -9,7 +9,7 @@
 const SettingsAPI = {
   async save(category, key, value) {
     try {
-      await fetch('/api/settings/update', {
+      await fetch(AppConfig.getApiUrl('/api/settings/update'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category, key, value })
@@ -21,7 +21,7 @@ const SettingsAPI = {
 
   async load() {
     try {
-      const res = await fetch('/api/settings/get_all');
+      const res = await fetch(AppConfig.getApiUrl('/api/settings/get_all'));
       const data = await res.json();
       return data.success ? data.settings : null;
     } catch (e) {
@@ -32,7 +32,7 @@ const SettingsAPI = {
 
   async reset() {
     try {
-      const res = await fetch('/api/settings/reset', { method: 'POST' });
+      const res = await fetch(AppConfig.getApiUrl('/api/settings/reset'), { method: 'POST' });
       const data = await res.json();
       return data.success ? data.settings : null;
     } catch (e) {
@@ -88,8 +88,21 @@ async function resetSettings() {
   }
 }
 
-// 초기화 및 서버 설정 동기화
+// 초기화 및 서버 설정 동기화 (인증 후에만)
 document.addEventListener('DOMContentLoaded', async () => {
+  // 인증 확인 - 토큰이 있고 유효한 경우에만 설정 로드
+  if (typeof AuthUtils === 'undefined') {
+    console.log('AuthUtils not loaded yet, skipping settings load');
+    return;
+  }
+
+  const token = AuthUtils.getStoredToken();
+  if (!token || AuthUtils.isTokenExpired(token)) {
+    console.log('No valid token, skipping settings load');
+    return;
+  }
+
+  // 인증된 경우에만 설정 로드
   const settings = await SettingsAPI.load();
   if (settings && settings.ui) {
     const ui = settings.ui;

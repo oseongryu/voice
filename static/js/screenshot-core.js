@@ -101,7 +101,7 @@ async function takeNewScreenshot() {
       }
     }
 
-    const response = await fetch("/api/take_screenshot", {
+    const response = await fetch(AppConfig.getApiUrl("/api/take_screenshot"), {
       method: "POST",
       headers: headers,
     });

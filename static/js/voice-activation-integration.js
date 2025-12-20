@@ -134,9 +134,27 @@ function updateVoiceOverlayStatus(text) {
 let customVoiceCommands = [];
 
 async function loadVoiceIntegrationSettings() {
+  // 인증 확인
+  if (typeof AuthUtils === 'undefined') {
+    console.log('AuthUtils not loaded yet');
+    return {
+      triggerPhrase: '인식해줘',
+      timeout: 5000
+    };
+  }
+
+  const token = AuthUtils.getStoredToken();
+  if (!token || AuthUtils.isTokenExpired(token)) {
+    console.log('No valid token, using default voice settings');
+    return {
+      triggerPhrase: '인식해줘',
+      timeout: 5000
+    };
+  }
+
   try {
     // Load Voice Settings
-    const settingsRes = await fetch('/api/settings');
+    const settingsRes = await fetch(AppConfig.getApiUrl('/api/settings'));
     const settingsData = await settingsRes.json();
 
     if (globalVoiceActivation) {
@@ -149,7 +167,7 @@ async function loadVoiceIntegrationSettings() {
     }
 
     // Load Commands
-    const cmdsRes = await fetch('/api/voice-commands');
+    const cmdsRes = await fetch(AppConfig.getApiUrl('/api/voice-commands'));
     const cmdsData = await cmdsRes.json();
     customVoiceCommands = cmdsData.commands || [];
 
@@ -453,7 +471,7 @@ async function executeRecordAndPaste(text) {
 
   try {
     // 1. 현재 위치 클릭 (API가 x,y 없을 시 현재 위치 클릭하도록 수정됨)
-    await fetch('/api/click_position', {
+    await fetch(AppConfig.getApiUrl('/api/click_position'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ click_type: 'left' })
@@ -469,7 +487,7 @@ async function executeRecordAndPaste(text) {
       await typeTextViaAPI(text);
     } else {
       // Fallback
-      await fetch('/api/type_text', {
+      await fetch(AppConfig.getApiUrl('/api/type_text'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text })
