@@ -265,7 +265,7 @@ body {
   font-size: 0.9rem;
   background: rgba(52, 58, 64, 0.9);
   color: white;
-  z-index: 3000;
+  z-index: 11000 !important;
   opacity: 0;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
@@ -400,6 +400,7 @@ body {
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.1);
   min-height: 1rem;
+  z-index: 11000 !important;
 }
 
 .header-toast.show {
@@ -503,7 +504,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 2000;
+  z-index: 10000 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -516,14 +517,14 @@ body {
   background: rgba(0, 0, 0, 0.45);
   /* slightly darker for readability */
   backdrop-filter: blur(2px);
-  z-index: 2001;
+  z-index: 10001 !important;
 }
 
 /* Make modal content more readable while keeping slight translucency */
 .instructions-modal .modal-content {
   position: relative;
   /* keep above overlay */
-  z-index: 2002;
+  z-index: 10002 !important;
   background: rgba(255, 255, 255, 0.96);
   /* near-opaque white for readability */
   color: #111;
@@ -733,7 +734,7 @@ body {
   padding: 1.5rem;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  z-index: 10500 !important;
   min-width: 300px;
   text-align: center;
   display: none;
@@ -914,4 +915,24 @@ body:not(.floating-header-mode) .floating-collapse-btn {
   padding-top: 0.5rem;
   margin-top: 0.5rem;
   font-style: italic;
+}
+
+/* ============================================ */
+/* Bootstrap Modal z-index overrides */
+/* Ensure all modals (text input, settings, etc.) are above other elements */
+/* ============================================ */
+.modal {
+  z-index: 10050 !important;
+}
+
+.modal-backdrop {
+  z-index: 10040 !important;
+}
+
+.modal-dialog {
+  z-index: 10051 !important;
+}
+
+.modal-content {
+  z-index: 10052 !important;
 }

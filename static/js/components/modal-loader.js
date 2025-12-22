@@ -36,7 +36,8 @@ const modalNames = [
     'modal-click-recorder',
     'modal-text-input',
     'modal-voice-history',
-    'modal-voice-settings'
+    'modal-voice-settings',
+    'modal-setting-menu'
 ];
 
 // 이미 등록된 컴포넌트 수 체크

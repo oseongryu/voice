@@ -388,8 +388,8 @@ function displayWebSocketScreenshot(imageBase64, screenWidth, screenHeight, meth
         return;
     }
 
-    // 이미지 표시
-    mainImg.src = `data:image/png;base64,${imageBase64}`;
+    // 이미지 표시 (서버에서 WebP 형식으로 전송)
+    mainImg.src = `data:image/webp;base64,${imageBase64}`;
 
     // 화면 정보 저장
     mainImg.dataset.screenWidth = String(screenWidth || '0');
@@ -693,27 +693,32 @@ function updateWebSocketToggleButton() {
 
     if (!btn) return;
 
+    // Helper function to get translation (fallback to key if t() not available)
+    const getText = (key, fallback) => {
+        return (typeof t === 'function' ? t(key) : fallback) || fallback;
+    };
+
     if (isConnected) {
         // 연결됨 -> "연결 종료" 상태
-        btn.innerHTML = '<i class="bi bi-stop-circle-fill"></i> 종료';
+        btn.innerHTML = `<i class="bi bi-stop-circle-fill"></i> <span data-i18n="ws.disconnect">${getText('ws.disconnect', '종료')}</span>`;
         // 위험(종료) 색상, 작은 버튼
         btn.className = "btn btn-danger btn-sm";
 
         if (statusDiv) {
             if (isStreaming) {
-                statusDiv.innerHTML = '<span class="text-success">● 스트리밍 중</span>';
+                statusDiv.innerHTML = `<span class="text-success">● <span data-i18n="ws.streaming">${getText('ws.streaming', '스트리밍 중')}</span></span>`;
             } else {
-                statusDiv.innerHTML = '<span class="text-primary">● 연결됨 (대기)</span>';
+                statusDiv.innerHTML = `<span class="text-primary">● <span data-i18n="ws.connected">${getText('ws.connected', '연결됨 (대기)')}</span></span>`;
             }
         }
     } else {
         // 연결 안됨 -> "라이브" 상태
-        btn.innerHTML = '<i class="bi bi-plug"></i> 라이브';
+        btn.innerHTML = `<i class="bi bi-plug"></i> <span data-i18n="nav.live">${getText('nav.live', '라이브')}</span>`;
         // 기본 아웃라인 스타일, 작은 버튼 (다른 네비게이션 버튼과 통일)
         btn.className = "btn btn-outline-secondary btn-sm";
 
         if (statusDiv) {
-            statusDiv.innerHTML = '<span class="text-muted">○ 연결되지 않음</span>';
+            statusDiv.innerHTML = `<span class="text-muted">○ <span data-i18n="ws.disconnected">${getText('ws.disconnected', '연결되지 않음')}</span></span>`;
         }
     }
 }

@@ -2,28 +2,30 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="serverConfigModalLabel">
-                    <i class="bi bi-shield-lock"></i> API 인증
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header" style="padding: 0.5rem 1rem;">
+                <h6 class="modal-title" id="serverConfigModalLabel" style="font-size: 0.95rem;">
+                    <i class="bi bi-shield-lock"></i> <span data-i18n="modal.server.title">API 인증</span>
+                </h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.8rem;"></button>
             </div>
             <div class="modal-body">
 
                 <!-- API 서버 선택 + 추가/삭제 -->
                 <div class="mb-3">
                     <label for="apiServerSelect" class="form-label">
-                        <i class="bi bi-hdd-stack"></i> API 서버 선택
+                        <i class="bi bi-hdd-stack"></i> <span data-i18n="modal.server.select">API 서버 선택</span>
                     </label>
                     <div class="input-group">
                         <select class="form-select" id="apiServerSelect" onchange="onApiServerSelectionChange()">
                             <!-- 동적으로 생성됨 -->
                         </select>
-                        <button class="btn btn-outline-success" type="button" onclick="addNewApiServer()" title="서버 추가">
+                        <button class="btn btn-outline-success" type="button" onclick="addNewApiServer()"
+                            data-i18n-target="title" data-i18n="modal.server.add" title="서버 추가">
                             <i class="bi bi-plus-lg"></i>
                         </button>
                         <button class="btn btn-outline-danger" type="button" onclick="removeCurrentApiServer()"
-                            title="현재 서버 삭제">
+                            data-i18n-target="title" data-i18n="modal.server.delete" title="현재 서버 삭제">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -32,7 +34,7 @@
                 <!-- API 서버 URL (항상 표시) -->
                 <div class="mb-3">
                     <label for="apiServerUrl" class="form-label">
-                        <i class="bi bi-server"></i> API 서버 URL
+                        <i class="bi bi-server"></i> <span data-i18n="modal.server.url">API 서버 URL</span>
                     </label>
                     <input type="text" class="form-control" id="apiServerUrl" placeholder="https://127.0.0.1:8000"
                         autocomplete="url">
@@ -42,17 +44,19 @@
                 <div id="apiAuthForm">
                     <div class="mb-3">
                         <label for="serverUsername" class="form-label">
-                            <i class="bi bi-person"></i> API 사용자명
+                            <i class="bi bi-person"></i> <span data-i18n="modal.server.username">API 사용자명</span>
                         </label>
-                        <input type="text" class="form-control" id="serverUsername" placeholder="API 사용자명 입력"
+                        <input type="text" class="form-control" id="serverUsername"
+                            data-i18n-placeholder="modal.server.username_placeholder" placeholder="API 사용자명 입력"
                             autocomplete="username">
                     </div>
 
                     <div class="mb-3">
                         <label for="serverPassword" class="form-label">
-                            <i class="bi bi-key"></i> API 비밀번호
+                            <i class="bi bi-key"></i> <span data-i18n="modal.server.password">API 비밀번호</span>
                         </label>
-                        <input type="password" class="form-control" id="serverPassword" placeholder="API 비밀번호 입력"
+                        <input type="password" class="form-control" id="serverPassword"
+                            data-i18n-placeholder="modal.server.password_placeholder" placeholder="API 비밀번호 입력"
                             autocomplete="current-password">
                     </div>
 
@@ -60,30 +64,31 @@
 
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" onclick="saveServerConfig()">
-                            <i class="bi bi-shield-check"></i> API 인증
+                            <i class="bi bi-shield-check"></i> <span data-i18n="modal.server.auth_button">API 인증</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- 인증 완료 메시지 (인증 시 표시) -->
                 <div id="apiAuthComplete" class="text-center text-success py-2" style="display: none;">
-                    <i class="bi bi-check-circle-fill"></i> 인증됨
+                    <i class="bi bi-check-circle-fill"></i> <span data-i18n="modal.server.authenticated">인증됨</span>
                 </div>
 
                 <hr>
 
                 <!-- 서버 목록 및 인증 상태 (동적 생성) -->
                 <div class="mb-2 d-flex justify-content-between align-items-center">
-                    <strong>서버 목록:</strong>
-                    <small class="text-muted" id="serverCount">0개</small>
+                    <strong data-i18n="modal.server.list">서버 목록:</strong>
+                    <small class="text-muted" id="serverCount">0<span data-i18n="modal.server.count">개</span></small>
                 </div>
                 <div id="serverStatusList" class="mb-3" style="max-height: 150px; overflow-y: auto;">
                     <!-- 동적으로 생성됨 -->
                 </div>
 
                 <div class="mb-3">
-                    <strong>현재 활성:</strong>
-                    <span class="badge bg-warning" id="authLevelBadge">로그인 완료 (API 미인증)</span>
+                    <strong data-i18n="modal.server.active">현재 활성:</strong>
+                    <span class="badge bg-warning" id="authLevelBadge" data-i18n="modal.server.status_logged_in">로그인 완료
+                        (API 미인증)</span>
                     <span class="badge bg-primary ms-1" id="activeServerBadge" style="display: none;"></span>
                 </div>
             </div>

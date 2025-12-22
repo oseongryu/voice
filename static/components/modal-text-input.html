@@ -5,7 +5,8 @@
             <div class="modal-body p-4">
                 <!-- 입력 영역 -->
                 <div class="mb-3">
-                    <textarea id="textToType" class="form-control" rows="3" placeholder="여기에 입력하세요..."></textarea>
+                    <textarea id="textToType" class="form-control" rows="3"
+                        data-i18n-placeholder="modal.text.placeholder" placeholder="여기에 입력하세요..."></textarea>
                 </div>
 
                 <!-- 메인 액션 버튼 -->
@@ -14,18 +15,18 @@
                         <div class="col">
                             <button class="btn btn-secondary w-100" data-bs-dismiss="modal"
                                 onclick="closeTypeTextModal()">
-                                취소
+                                <span data-i18n="modal.text.cancel">취소</span>
                             </button>
                         </div>
                         <div class="col">
                             <button class="btn btn-primary w-100 fw-bold" onclick="performTypeText()">
-                                전송
+                                <span data-i18n="modal.text.send">전송</span>
                             </button>
                         </div>
                         <div class="col">
                             <button id="textModalVoiceBtn" class="btn btn-danger w-100"
                                 onclick="toggleTextModalRecording()">
-                                <i class="bi bi-mic-fill"></i> 녹음
+                                <i class="bi bi-mic-fill"></i> <span data-i18n="modal.text.record">녹음</span>
                             </button>
                         </div>
                     </div>

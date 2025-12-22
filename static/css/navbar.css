@@ -132,7 +132,7 @@
   /* Chrome/Safari */
 }
 
-/* Prevent dropdown clipping by making it fixed positioned */
+/* Dropdowns as centered popups (for any remaining dropdowns) */
 #topNavbar .dropdown-menu {
   position: fixed !important;
   top: 50% !important;
@@ -144,8 +144,7 @@
   overflow-y: auto;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
   border-radius: 0.5rem;
-  z-index: 2000;
-  /* Higher than navbar */
+  z-index: 9999 !important;
 }
 
 /* Add a backdrop effect logic if needed, but for now shadow is enough */

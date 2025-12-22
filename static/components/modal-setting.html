@@ -3,43 +3,12 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content">
             <div class="modal-header" style="padding: 0.5rem 1rem;">
-                <h6 class="modal-title" id="settingModalLabel" style="font-size: 0.95rem;">⚙️ 설정</h6>
+                <h6 class="modal-title" id="settingModalLabel" style="font-size: 0.95rem;">⚙️ <span
+                        data-i18n="modal.setting.title">설정</span></h6>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
                     style="font-size: 0.8rem;"></button>
             </div>
             <div class="modal-body">
-
-
-                <!-- UI 설정 섹션 -->
-                <div class="debug-section mb-4">
-                    <h6 class="text-primary mb-2">⚙️ UI 설정</h6>
-                    <div class="mb-3">
-                        <label for="headerModeSelect" class="form-label">헤더 스타일 (Header Style):</label>
-                        <select id="headerModeSelect" class="form-select" onchange="changeHeaderMode(this.value)">
-                            <option value="normal">기본 (Normal)</option>
-                            <option value="fixed">상단 고정 (Sticky)</option>
-                            <option value="floating">플로팅 자동 숨김 (Floating)</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="textModalPositionSelect" class="form-label">텍스트 입력 팝업 위치:</label>
-                        <select id="textModalPositionSelect" class="form-select"
-                            onchange="changeTextModalPosition(this.value)">
-                            <option value="top">상단</option>
-                            <option value="center">중앙</option>
-                            <option value="top-start">왼쪽 상단</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="screenshotDelayInput" class="form-label">스크린샷 갱신 지연시간 (ms):</label>
-                        <div class="input-group">
-                            <input type="number" id="screenshotDelayInput" class="form-control" value="1000" step="100"
-                                min="0" onchange="changeScreenshotDelay(this.value)">
-                            <span class="input-group-text">ms</span>
-                        </div>
-                        <div class="form-text" style="font-size: 0.8rem;">입력/클릭 후 화면 갱신까지의 대기 시간 (기본값: 1000ms)</div>
-                    </div>
-                </div>
 
                 <!-- 언어 설정 섹션 -->
                 <div class="debug-section mb-4">
@@ -49,12 +18,116 @@
                         <option value="en">🇺🇸 English</option>
                     </select>
                 </div>
+
+                <!-- UI 설정 섹션 -->
+                <div class="debug-section mb-4">
+                    <h6 class="text-primary mb-2" data-i18n="modal.setting.ui_settings">⚙️ UI 설정</h6>
+                    <div class="mb-3">
+                        <label for="headerModeSelect" class="form-label" data-i18n="modal.setting.header_style">헤더 스타일
+                            (Header Style):</label>
+                        <select id="headerModeSelect" class="form-select" onchange="changeHeaderMode(this.value)">
+                            <option value="normal" data-i18n="modal.setting.header_normal">기본 (Normal)</option>
+                            <option value="fixed" data-i18n="modal.setting.header_fixed">상단 고정 (Sticky)</option>
+                            <option value="floating" data-i18n="modal.setting.header_floating">플로팅 자동 숨김 (Floating)
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="textModalPositionSelect" class="form-label"
+                            data-i18n="modal.setting.text_modal_position">텍스트 입력 팝업 위치:</label>
+                        <select id="textModalPositionSelect" class="form-select"
+                            onchange="changeTextModalPosition(this.value)">
+                            <option value="top" data-i18n="modal.setting.position_top">상단</option>
+                            <option value="center" data-i18n="modal.setting.position_center">중앙</option>
+                            <option value="top-start" data-i18n="modal.setting.position_top_start">왼쪽 상단</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userMenuPositionSelect" class="form-label"
+                            data-i18n="modal.setting.user_menu_position">사용자 메뉴 팝업 위치:</label>
+                        <select id="userMenuPositionSelect" class="form-select"
+                            onchange="changeUserMenuPosition(this.value)">
+                            <option value="top" data-i18n="modal.setting.position_top">상단</option>
+                            <option value="center" data-i18n="modal.setting.position_center">중앙</option>
+                            <option value="top-start" data-i18n="modal.setting.position_top_start">왼쪽 상단</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="screenshotDelayInput" class="form-label"
+                            data-i18n="modal.setting.screenshot_delay">스크린샷 갱신 지연시간 (ms):</label>
+                        <div class="input-group">
+                            <input type="number" id="screenshotDelayInput" class="form-control" value="1000" step="100"
+                                min="0" onchange="changeScreenshotDelay(this.value)">
+                            <span class="input-group-text">ms</span>
+                        </div>
+                        <div class="form-text" style="font-size: 0.8rem;"
+                            data-i18n="modal.setting.screenshot_delay_help">입력/클릭 후 화면 갱신까지의 대기 시간 (기본값: 1000ms)</div>
+                    </div>
+                </div>
+
+
+                <!-- 헤더 항목 표시 설정 섹션 -->
+                <div class="debug-section mb-4">
+                    <h6 class="text-primary mb-2" data-i18n="modal.setting.header_items">🔧 헤더 항목 표시</h6>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemScreenshot" checked
+                            onchange="toggleHeaderItem('screenshot', this.checked)">
+                        <label class="form-check-label" for="headerItemScreenshot"
+                            data-i18n="modal.setting.show_screenshot">
+                            화면 캡처 버튼
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemText" checked
+                            onchange="toggleHeaderItem('text', this.checked)">
+                        <label class="form-check-label" for="headerItemText" data-i18n="modal.setting.show_text">
+                            텍스트 입력 버튼
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemMouse" checked
+                            onchange="toggleHeaderItem('mouse', this.checked)">
+                        <label class="form-check-label" for="headerItemMouse" data-i18n="modal.setting.show_mouse">
+                            마우스 모드 버튼
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemVoice" checked
+                            onchange="toggleHeaderItem('voice', this.checked)">
+                        <label class="form-check-label" for="headerItemVoice" data-i18n="modal.setting.show_voice">
+                            음성 인식 버튼
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemLive" checked
+                            onchange="toggleHeaderItem('live', this.checked)">
+                        <label class="form-check-label" for="headerItemLive" data-i18n="modal.setting.show_live">
+                            라이브 연결 버튼
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemCoordinates" checked
+                            onchange="toggleHeaderItem('coordinates', this.checked)">
+                        <label class="form-check-label" for="headerItemCoordinates"
+                            data-i18n="modal.setting.show_coordinates">
+                            좌표 표시
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="headerItemZoom" checked
+                            onchange="toggleHeaderItem('zoom', this.checked)">
+                        <label class="form-check-label" for="headerItemZoom" data-i18n="modal.setting.show_zoom">
+                            확대/축소 버튼
+                        </label>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer" style="padding: 0.5rem 1rem;">
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetSettings()">
-                    <i class="bi bi-arrow-counterclockwise"></i> 설정 초기화
+                    <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="modal.setting.reset">설정 초기화</span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"
+                    data-i18n="modal.setting.close">닫기</button>
             </div>
         </div>
     </div>

@@ -4,7 +4,35 @@
    - Can export/import JSON, playback sequentially to server using performClick
 */
 
-// console.log('click-recorder.js executing');
+// i18n 텍스트 헬퍼 함수 (auth-utils.js에서 이미 정의됨)
+// const getText = (key, fallback) => (typeof t === 'function' ? t(key) : fallback);
+
+// 클릭 레코더 관련 텍스트 (i18n 지원)
+const RECORDER_TEXT = {
+  get screenshotFirst() { return getText('recorder.screenshot_first', '녹화하려면 먼저 스크린샷을 촬영하세요.'); },
+  get start() { return getText('recorder.start', '녹화 시작: 스크린샷을 클릭하면 이벤트가 기록됩니다'); },
+  get stop() { return getText('recorder.stop', '녹화 중지'); },
+  get clearConfirm() { return getText('recorder.clear_confirm', '녹화된 이벤트를 모두 삭제하겠습니까?'); },
+  get deleteAllConfirm() { return getText('recorder.delete_all_confirm', '선택된 항목이 없습니다. 전체를 삭제하시겠습니까?'); },
+  deletedItems(count) { return getText('recorder.deleted_items', '선택된 {count}개 항목을 삭제했습니다.').replace('{count}', count); },
+  get noEvents() { return getText('recorder.no_events', '저장할 이벤트가 없습니다'); },
+  get groupSaved() { return getText('recorder.group_saved', '그룹 저장 완료'); },
+  get groupSaveFailed() { return getText('recorder.group_save_failed', '그룹 저장 실패'); },
+  get selectGroupLoad() { return getText('recorder.select_group_load', '불러올 그룹을 선택하세요'); },
+  get groupLoaded() { return getText('recorder.group_loaded', '그룹 불러오기 완료'); },
+  get groupLoadFailed() { return getText('recorder.group_load_failed', '그룹 불러오기 실패'); },
+  get selectGroupDelete() { return getText('recorder.select_group_delete', '삭제할 그룹을 선택하세요'); },
+  get deleteGroupConfirm() { return getText('recorder.delete_group_confirm', '선택한 그룹을 삭제하시겠습니까?'); },
+  get groupDeleted() { return getText('recorder.group_deleted', '그룹 삭제 완료'); },
+  get groupDeleteFailed() { return getText('recorder.group_delete_failed', '그룹 삭제 실패'); },
+  get selectGroupRun() { return getText('recorder.select_group_run', '실행할 그룹을 선택하세요'); },
+  get groupRunFailed() { return getText('recorder.group_run_failed', '그룹 실행 실패'); },
+  get importSuccess() { return getText('recorder.import_success', '녹화 불러오기 완료'); },
+  get importFailed() { return getText('recorder.import_failed', '불러오기 실패: 잘못된 파일입니다'); },
+  get playbackStart() { return getText('recorder.playback_start', '재생 시작...'); },
+  get playbackComplete() { return getText('recorder.playback_complete', '재생 완료'); }
+};
+
 
 let clickRecording = [];
 let isRecordingClicks = false;
@@ -214,7 +242,7 @@ function detachClickRecorderListeners() {
 function startRecordingClicks() {
   // require a screenshot to be loaded so coordinates can be mapped
   if (!currentScreenshot) {
-    showToast('녹화하려면 먼저 스크린샷을 촬영하세요.', 'error');
+    showToast(RECORDER_TEXT.screenshotFirst, 'error');
     return;
   }
 
@@ -223,7 +251,7 @@ function startRecordingClicks() {
   const tBtn = document.getElementById('stopRecordBtn');
   if (sBtn) sBtn.style.display = 'none';
   if (tBtn) tBtn.style.display = 'inline-block';
-  showToast('녹화 시작: 스크린샷을 클릭하면 이벤트가 기록됩니다', 'info');
+  showToast(RECORDER_TEXT.start, 'info');
   // reflect on header buttons if present
   const gStart = document.getElementById('globalStartRecordBtn');
   const gStop = document.getElementById('globalStopRecordBtn');
@@ -237,7 +265,7 @@ function stopRecordingClicks() {
   const tBtn = document.getElementById('stopRecordBtn');
   if (sBtn) sBtn.style.display = 'inline-block';
   if (tBtn) tBtn.style.display = 'none';
-  showToast('녹화 중지', 'success');
+  showToast(RECORDER_TEXT.stop, 'success');
   const gStart = document.getElementById('globalStartRecordBtn');
   const gStop = document.getElementById('globalStopRecordBtn');
   if (gStart) gStart.style.display = 'inline-block';
@@ -245,7 +273,7 @@ function stopRecordingClicks() {
 }
 
 function clearRecording() {
-  if (!confirm('녹화된 이벤트를 모두 삭제하겠습니까?')) return;
+  if (!confirm(RECORDER_TEXT.clearConfirm)) return;
   clickRecording = [];
   updateRecordUI();
   // update global UI count if present
@@ -264,7 +292,7 @@ function deleteSelectedRecording() {
   const selectionEnd = textarea.selectionEnd;
   if (selectionStart === selectionEnd) {
     // nothing selected - ask to clear all instead
-    if (!confirm('선택된 항목이 없습니다. 전체를 삭제하시겠습니까?')) return;
+    if (!confirm(RECORDER_TEXT.deleteAllConfirm)) return;
     clickRecording = [];
     updateRecordUI();
     return;
@@ -296,7 +324,7 @@ function deleteSelectedRecording() {
 
   clickRecording = newRecording;
   updateRecordUI();
-  showToast(`✅ 선택된 ${numSelectedLines}개 항목을 삭제했습니다.`, 'success');
+  showToast(RECORDER_TEXT.deletedItems(numSelectedLines), 'success');
 }
 
 // --- Group persistence functions (server-backed) ---
@@ -321,7 +349,7 @@ async function refreshSavedGroups() {
 async function saveCurrentGroup() {
   const nameEl = document.getElementById('saveGroupName');
   const name = nameEl && nameEl.value ? nameEl.value : `Group ${new Date().toISOString()}`;
-  if (clickRecording.length === 0) { showToast('저장할 이벤트가 없습니다', 'error'); return; }
+  if (clickRecording.length === 0) { showToast(RECORDER_TEXT.noEvents, 'error'); return; }
   try {
     // assume currentScreenshot exists and has screen_width/height
     const res = await fetch(AppConfig.getApiUrl('/api/click-groups'), {
@@ -330,18 +358,18 @@ async function saveCurrentGroup() {
     });
     if (!res.ok) throw new Error('save failed');
     const data = await res.json();
-    showToast('그룹 저장 완료', 'success');
+    showToast(RECORDER_TEXT.groupSaved, 'success');
     if (nameEl) nameEl.value = '';
     refreshSavedGroups();
   } catch (err) {
     console.error('saveCurrentGroup error', err);
-    showToast('그룹 저장 실패', 'error');
+    showToast(RECORDER_TEXT.groupSaveFailed, 'error');
   }
 }
 
 async function loadSelectedGroup() {
   const sel = document.getElementById('savedGroupsSelect');
-  if (!sel || !sel.value) return showToast('불러올 그룹을 선택하세요', 'error');
+  if (!sel || !sel.value) return showToast(RECORDER_TEXT.selectGroupLoad, 'error');
   try {
     const res = await fetch(AppConfig.getApiUrl(`/api/click-groups/${sel.value}`));
     if (!res.ok) throw new Error('load failed');
@@ -352,31 +380,31 @@ async function loadSelectedGroup() {
     clickRecording._ref_width = data.ref_width;
     clickRecording._ref_height = data.ref_height;
     updateRecordUI();
-    showToast('그룹 불러오기 완료', 'success');
+    showToast(RECORDER_TEXT.groupLoaded, 'success');
   } catch (err) {
     console.error('loadSelectedGroup error', err);
-    showToast('그룹 불러오기 실패', 'error');
+    showToast(RECORDER_TEXT.groupLoadFailed, 'error');
   }
 }
 
 async function deleteSelectedGroup() {
   const sel = document.getElementById('savedGroupsSelect');
-  if (!sel || !sel.value) return showToast('삭제할 그룹을 선택하세요', 'error');
-  if (!confirm('선택한 그룹을 삭제하시겠습니까?')) return;
+  if (!sel || !sel.value) return showToast(RECORDER_TEXT.selectGroupDelete, 'error');
+  if (!confirm(RECORDER_TEXT.deleteGroupConfirm)) return;
   try {
     const res = await fetch(AppConfig.getApiUrl(`/api/click-groups/${sel.value}`), { method: 'DELETE' });
     if (!res.ok) throw new Error('delete failed');
-    showToast('그룹 삭제 완료', 'success');
+    showToast(RECORDER_TEXT.groupDeleted, 'success');
     refreshSavedGroups();
   } catch (err) {
     console.error('deleteSelectedGroup error', err);
-    showToast('그룹 삭제 실패', 'error');
+    showToast(RECORDER_TEXT.groupDeleteFailed, 'error');
   }
 }
 
 async function runSelectedGroup() {
   const sel = document.getElementById('savedGroupsSelect');
-  if (!sel || !sel.value) return showToast('실행할 그룹을 선택하세요', 'error');
+  if (!sel || !sel.value) return showToast(RECORDER_TEXT.selectGroupRun, 'error');
   try {
     const res = await fetch(AppConfig.getApiUrl(`/api/click-groups/${sel.value}`));
     if (!res.ok) throw new Error('load failed');
@@ -389,7 +417,7 @@ async function runSelectedGroup() {
     await playbackRecording();
   } catch (err) {
     console.error('runSelectedGroup error', err);
-    showToast('그룹 실행 실패', 'error');
+    showToast(RECORDER_TEXT.groupRunFailed, 'error');
   }
 }
 
@@ -421,9 +449,9 @@ function importRecordingFromFile(e) {
       clickRecording._ref_width = parsed.ref_width;
       clickRecording._ref_height = parsed.ref_height;
       updateRecordUI();
-      showToast('녹화 불러오기 완료', 'success');
+      showToast(RECORDER_TEXT.importSuccess, 'success');
     } catch (err) {
-      showToast('불러오기 실패: 잘못된 파일입니다', 'error');
+      showToast(RECORDER_TEXT.importFailed, 'error');
     }
   };
   reader.readAsText(file);
@@ -435,7 +463,7 @@ async function playbackRecording() {
   if (clickRecording.length === 0) return;
 
   const speed = parseFloat(document.getElementById('playbackSpeed').value) || 1;
-  showToast('재생 시작...', 'info');
+  showToast(RECORDER_TEXT.playbackStart, 'info');
 
   // play sequentially using intervals derived from timestamps
   // compute relative delays between events and play adjusted by speed
@@ -463,7 +491,7 @@ async function playbackRecording() {
     }
   }
 
-  showToast('재생 완료', 'success');
+  showToast(RECORDER_TEXT.playbackComplete, 'success');
 }
 
 // expose some functions for external use/testing

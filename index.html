@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>화면 제어 - 음성 텍스트 변환</title>
+  <title data-i18n="page.title">화면 제어 - 음성 텍스트 변환</title>
   <!-- AG Grid CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css" />
   <!-- Bootstrap 5 CSS -->
@@ -30,7 +30,7 @@
     <div class="container-fluid">
       <!-- Floating Header Collapse Button -->
       <button class="btn btn-sm btn-outline-secondary me-2 floating-collapse-btn" onclick="toggleFloatingHeader()"
-        title="메뉴 숨기기" style="display: none;">
+        data-i18n-target="title" data-i18n="nav.hide_menu" title="메뉴 숨기기" style="display: none;">
         <i class="bi bi-chevron-right"></i>
       </button>
 
@@ -42,16 +42,17 @@
         <!-- Screenshot Mode Controls -->
         <ul id="mainNavButtons" class="navbar-nav mb-2 mb-sm-0 align-items-center flex-row">
           <!-- Main Action: Screenshot (Visible only in Screenshot Mode) -->
-          <li class="nav-item me-2" id="screenshotActionItem">
+          <li class="nav-item me-2" id="screenshotActionItem" data-header-item="screenshot">
             <button id="takeScreenshotBtn" class="btn btn-primary btn-sm" onclick="takeNewScreenshot()"
-              title="새 스크린샷 캡처">
+              data-i18n-target="title" data-i18n="nav.screenshot_capture" title="새 스크린샷 캡처">
               <i class="bi bi-camera-fill"></i> <span data-i18n="nav.screenshot">화면</span>
             </button>
           </li>
 
           <!-- Text Input Button -->
-          <li class="nav-item me-2">
-            <button class="btn btn-outline-secondary btn-sm" onclick="showTypeTextModal()" title="텍스트 입력">
+          <li class="nav-item me-2" data-header-item="text">
+            <button class="btn btn-outline-secondary btn-sm" onclick="showTypeTextModal()" data-i18n-target="title"
+              data-i18n="nav.text_input" title="텍스트 입력">
               <i class="bi bi-keyboard"></i> <span data-i18n="nav.text">Text</span>
             </button>
           </li>
@@ -59,106 +60,56 @@
 
 
           <!-- Mouse Mode Button -->
-          <li class="nav-item me-2">
+          <li class="nav-item me-2" data-header-item="mouse">
             <button id="mouseModeBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleMouseMode()"
-              title="마우스 이동 모드">
+              data-i18n-target="title" data-i18n="nav.mouse_mode" title="마우스 이동 모드">
               <i class="bi bi-cursor-fill"></i> <span data-i18n="nav.mouse">마우스</span>
             </button>
           </li>
 
           <!-- Voice Button -->
-          <li class="nav-item me-2">
+          <li class="nav-item me-2" data-header-item="voice">
             <button id="voiceBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleVoiceActivation()"
-              title="음성 인식">
+              data-i18n-target="title" data-i18n="nav.voice_recognition" title="음성 인식">
               <i class="bi bi-mic-fill"></i> <span data-i18n="nav.voice">음성</span>
             </button>
           </li>
 
           <!-- WebSocket Toggle Button (Live Connection) -->
-          <li class="nav-item me-2">
+          <li class="nav-item me-2" data-header-item="live">
             <button id="wsToggleBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleWebSocketConnection()"
-              title="라이브">
-              <i class="bi bi-plug"></i>라이브
+              data-i18n-target="title" data-i18n="nav.live" title="라이브">
+              <i class="bi bi-plug"></i> <span data-i18n="nav.live">라이브</span>
             </button>
           </li>
 
-          <!-- User Account Dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              <i class="bi bi-person-circle"></i> <span id="currentUsername">사용자</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li>
-                <button class="dropdown-item" onclick="showSettingModal()">
-                  <i class="bi bi-gear"></i> <span data-i18n="nav.tools.debug">설정</span>
-                </button>
-              </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li>
-                <button class="dropdown-item" onclick="showServerConfigModal()">
-                  <i class="bi bi-hdd-network"></i> <span>API 서버 연결</span>
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item" onclick="showVoiceSettingsModal()">
-                  <i class="bi bi-mic-fill"></i> <span data-i18n="nav.tools.voice_settings">음성 설정</span>
-                </button>
-              </li>
-
-              <li>
-                <button class="dropdown-item" onclick="showClickRecorderModal()">
-                  <i class="bi bi-record-circle"></i><span data-i18n="nav.tools.macro">매크로 기록</span>
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item" onclick="showVoiceHistoryModal()">
-                  <i class="bi bi-journal-text"></i><span data-i18n="nav.tools.history">음성 히스토리</span>
-                </button>
-              </li>
-              <li>
-                <button class="dropdown-item" onclick="show2FASettingsModal()">
-                  <i class="bi bi-shield-lock"></i> <span>2단계 인증</span>
-                </button>
-              </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li>
-                <button class="dropdown-item text-danger" onclick="handleLogout()">
-                  <i class="bi bi-box-arrow-right"></i> <span>로그아웃</span>
-                </button>
-              </li>
-            </ul>
+          <!-- User Account Button -->
+          <li class="nav-item" data-header-item="user">
+            <button class="btn btn-outline-secondary btn-sm" onclick="showSettingsMenuModal()">
+              <i class="bi bi-gear"></i> <span data-i18n="nav.settings">설정</span>
+            </button>
           </li>
 
           <!-- Coordinates -->
-          <li class="nav-item me-3">
+          <li class="nav-item me-2" data-header-item="coordinates">
             <div id="coordinates"
               class="badge bg-dark text-wrap font-monospace d-flex justify-content-center align-items-center"
               style="font-size: 0.85rem; width: 140px;">(0, 0)</div>
           </li>
 
           <!-- Zoom Controls -->
-          <li class="nav-item">
+          <li class="nav-item me-2" data-header-item="zoom">
             <div class="btn-group btn-group-sm">
-              <button class="btn btn-outline-secondary" onclick="zoomOut()" title="축소"><i
-                  class="bi bi-dash"></i></button>
+              <button class="btn btn-outline-secondary" onclick="zoomOut()" data-i18n-target="title"
+                data-i18n="nav.zoom_out" title="축소"><i class="bi bi-dash"></i></button>
               <span class="btn btn-outline-secondary disabled text-dark border-start-0 border-end-0" id="zoomLevelLabel"
                 style="opacity: 1; background: #fff; min-width: 50px;">100%</span>
-              <button class="btn btn-outline-secondary" onclick="zoomIn()" title="확대"><i
-                  class="bi bi-plus"></i></button>
-              <button class="btn btn-outline-secondary" onclick="resetZoom()" title="초기화"><i
-                  class="bi bi-arrow-counterclockwise"></i></button>
-              <button class="btn btn-outline-secondary" onclick="toggleFullScreen()" title="전체화면"><i
-                  class="bi bi-arrows-fullscreen"></i></button>
-              <button class="btn btn-outline-secondary" onclick="fitToScreen()" title="재조정"><i
-                  class="bi bi-arrow-repeat"></i></button>
+              <button class="btn btn-outline-secondary" onclick="zoomIn()" data-i18n-target="title"
+                data-i18n="nav.zoom_in" title="확대"><i class="bi bi-plus"></i></button>
+              <button class="btn btn-outline-secondary" onclick="resetZoom()" data-i18n-target="title"
+                data-i18n="nav.zoom_reset" title="초기화"><i class="bi bi-arrow-counterclockwise"></i></button>
+              <button class="btn btn-outline-secondary" onclick="toggleFullScreen()" data-i18n-target="title"
+                data-i18n="nav.fullscreen" title="전체화면"><i class="bi bi-arrows-fullscreen"></i></button>
             </div>
           </li>
         </ul>
@@ -167,7 +118,8 @@
   </nav>
 
   <!-- Floating Header Controls -->
-  <button id="floatingHeaderBtn" class="header-floating-btn" onclick="toggleFloatingHeader()" title="메뉴 열기">
+  <button id="floatingHeaderBtn" class="header-floating-btn" onclick="toggleFloatingHeader()" data-i18n-target="title"
+    data-i18n="nav.show_menu" title="메뉴 열기">
     <i class="bi bi-list"></i>
   </button>
 
@@ -193,7 +145,8 @@
   <div class="container">
     <div id="screenshotContainer" class="screenshot-container">
       <div class="screenshot-content">
-        <img id="screenshotImage" class="screenshot-image" alt="서버 화면" />
+        <img id="screenshotImage" class="screenshot-image" data-i18n-target="alt" data-i18n="screenshot.alt"
+          alt="서버 화면" />
       </div>
 
     </div>
@@ -213,6 +166,7 @@
     <modal-server-config></modal-server-config>
     <modal-login></modal-login>
     <modal-setting></modal-setting>
+    <modal-setting-menu></modal-setting-menu>
     <modal-click-recorder></modal-click-recorder>
     <modal-text-input></modal-text-input>
     <modal-voice-history></modal-voice-history>
@@ -288,12 +242,12 @@
   <script>
     // 페이지 로드 시 로그인 확인 (더 확실하게)
     document.addEventListener('DOMContentLoaded', function () {
-      console.log('인증 체크 시작...');
+      console.log(t('console.auth_check_start') || '인증 체크 시작...');
 
       // showLoginModal 함수가 로드될 때까지 대기
       const checkAuthAndShowModal = () => {
         if (typeof AuthUtils === 'undefined' || typeof showLoginModal === 'undefined') {
-          console.log('AuthUtils 또는 showLoginModal 로딩 대기 중...');
+          console.log(t('console.auth_utils_loading') || 'AuthUtils 또는 showLoginModal 로딩 대기 중...');
           setTimeout(checkAuthAndShowModal, 50);
           return;
         }
@@ -301,7 +255,7 @@
         const token = AuthUtils.getStoredToken();
 
         if (!token) {
-          console.log('토큰이 없음 - 로그인 모달 표시');
+          console.log(t('console.no_token') || '토큰이 없음 - 로그인 모달 표시');
           // 약간의 지연 후 모달 표시 (DOM 완전히 준비되도록)
           setTimeout(() => {
             showLoginModal();
@@ -311,7 +265,7 @@
 
         // 토큰이 만료되었는지 확인
         if (AuthUtils.isTokenExpired(token)) {
-          console.log('토큰 만료됨 - 로그인 모달 표시');
+          console.log(t('console.token_expired') || '토큰 만료됨 - 로그인 모달 표시');
           AuthUtils.clearStoredToken();
           setTimeout(() => {
             showLoginModal();
@@ -319,7 +273,7 @@
           return;
         }
 
-        console.log('유효한 토큰 존재 - 인증 통과');
+        console.log(t('console.token_valid') || '유효한 토큰 존재 - 인증 통과');
       };
 
       // 인증 체크 시작

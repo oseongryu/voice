@@ -24,6 +24,11 @@ async function setLanguage(lang) {
 
         // Update language select state
         updateLanguageSelect(lang);
+
+        // Update WebSocket button if the function exists
+        if (typeof updateWebSocketToggleButton === 'function') {
+            updateWebSocketToggleButton();
+        }
     } catch (error) {
         console.error('Error setting language:', error);
     }
@@ -50,12 +55,17 @@ function updateUI() {
             if (targetAttr) {
                 el.setAttribute(targetAttr, t(key));
             } else {
-                // If the element has children (like icons), we might be overwriting them.
-                // Strategy: if element has 'bi' class children, preserve them?
-                // Or expect the developer to put text in a span.
-                // For simplicity, I'll assume text-only or carefully wrapped elements.
-                // If there's an icon, we might need a structure like <i class="..."></i> <span data-i18n="key">Text</span>
-                el.innerText = t(key);
+                // Special handling for title tag
+                if (el.tagName === 'TITLE') {
+                    el.textContent = t(key);
+                } else {
+                    // If the element has children (like icons), we might be overwriting them.
+                    // Strategy: if element has 'bi' class children, preserve them?
+                    // Or expect the developer to put text in a span.
+                    // For simplicity, I'll assume text-only or carefully wrapped elements.
+                    // If there's an icon, we might need a structure like <i class="..."></i> <span data-i18n="key">Text</span>
+                    el.innerText = t(key);
+                }
             }
         }
     });

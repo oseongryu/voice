@@ -1,0 +1,46 @@
+<!-- 사용자 메뉴 모달 -->
+<div class="modal fade" id="settingMenuModal" tabindex="-1" aria-labelledby="settingMenuModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="settingMenuModalDialog">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 0.5rem 1rem;">
+                <h6 class="modal-title" id="settingMenuModalLabel" style="font-size: 0.95rem;">
+                    -
+                </h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.8rem;"></button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action"
+                        onclick="showSettingModal(); closesettingMenuModal();">
+                        <i class="bi bi-gear"></i> <span data-i18n="nav.tools.debug">설정</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action"
+                        onclick="showServerConfigModal(); closesettingMenuModal();">
+                        <i class="bi bi-hdd-network"></i> <span data-i18n="nav.api_server">API 서버 연결</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action"
+                        onclick="showVoiceSettingsModal(); closesettingMenuModal();">
+                        <i class="bi bi-mic-fill"></i> <span data-i18n="nav.tools.voice_settings">음성 설정</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action"
+                        onclick="showClickRecorderModal(); closesettingMenuModal();">
+                        <i class="bi bi-record-circle"></i> <span data-i18n="nav.tools.macro">매크로 기록</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action"
+                        onclick="showVoiceHistoryModal(); closesettingMenuModal();">
+                        <i class="bi bi-journal-text"></i> <span data-i18n="nav.tools.history">음성 히스토리</span>
+                    </button>
+                    <button class="list-group-item list-group-item-action"
+                        onclick="show2FASettingsModal(); closesettingMenuModal();">
+                        <i class="bi bi-shield-lock"></i> <span data-i18n="nav.2fa">2단계 인증</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="list-group-item list-group-item-action text-danger" onclick="handleLogout();">
+                        <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">로그아웃</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

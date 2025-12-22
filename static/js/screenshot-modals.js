@@ -59,6 +59,9 @@ async function resetSettings() {
     changeTextModalPosition(ui.text_modal_position, false);
     localStorage.setItem('textModalPosition', ui.text_modal_position);
 
+    changeUserMenuPosition(ui.user_menu_position, false);
+    localStorage.setItem('userMenuPosition', ui.user_menu_position);
+
     changeScreenshotDelay(ui.screenshot_delay, false);
     localStorage.setItem('screenshotDelay', ui.screenshot_delay);
 
@@ -75,6 +78,9 @@ async function resetSettings() {
 
     const posSelect = document.getElementById('textModalPositionSelect');
     if (posSelect) posSelect.value = ui.text_modal_position;
+
+    const userMenuPosSelect = document.getElementById('userMenuPositionSelect');
+    if (userMenuPosSelect) userMenuPosSelect.value = ui.user_menu_position;
 
     const delayInput = document.getElementById('screenshotDelayInput');
     if (delayInput) delayInput.value = ui.screenshot_delay;
@@ -121,22 +127,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (select) select.value = ui.text_modal_position;
     }
 
-    // 3. Screenshot Delay
+    // 3. User Menu Position
+    if (ui.user_menu_position) {
+      changeUserMenuPosition(ui.user_menu_position, false);
+      const select = document.getElementById('userMenuPositionSelect');
+      if (select) select.value = ui.user_menu_position;
+    }
+
+    // 4. Screenshot Delay
     if (ui.screenshot_delay) {
       changeScreenshotDelay(ui.screenshot_delay, false);
       const input = document.getElementById('screenshotDelayInput');
       if (input) input.value = ui.screenshot_delay;
     }
 
-    // 4. Language
+    // 5. Language
     if (ui.language) {
       // i18n 모듈이 있으면 언어 설정 (setLanguage 함수가 있다고 가정)
       if (typeof setLanguage === 'function') {
         const select = document.getElementById('languageSelect');
         if (select) select.value = ui.language;
-        // setLanguage는 보통 내부적으로 로컬리소스를 다시 로드하므로 
+        // setLanguage는 보통 내부적으로 로컬리소스를 다시 로드하므로
         // 여기서 호출하면 됨. 단, 무한루프 방지 주의
       }
+    }
+
+    // 6. Header Items
+    if (ui.header_items) {
+      applyHeaderItemsSettings(ui.header_items);
     }
   }
 });
@@ -146,17 +164,20 @@ function applyTextModalPosition(position) {
   const dialog = document.getElementById('typeTextModalDialog');
   if (!dialog) return;
 
+  // 기존 위치 클래스 제거
   dialog.classList.remove('modal-dialog-centered', 'modal-dialog-scrollable');
 
+  // 스타일 초기화
+  dialog.style.marginTop = '';
+  dialog.style.marginLeft = '';
+
+  // 위치에 따라 스타일 적용
   switch (position) {
     case 'center':
       dialog.classList.add('modal-dialog-centered');
-      dialog.style.marginTop = '';
-      dialog.style.marginLeft = '';
       break;
     case 'top':
       dialog.style.marginTop = '60px';
-      dialog.style.marginLeft = '';
       break;
     case 'top-start':
       dialog.style.marginTop = '60px';
@@ -223,6 +244,76 @@ function changeTextModalPosition(position, save = true) {
   }
 }
 
+// 설정 메뉴 모달 열기
+function showSettingsMenuModal() {
+  const modalEl = document.getElementById('settingMenuModal');
+  if (!modalEl) {
+    console.error('settingMenuModal not found');
+    return;
+  }
+
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
+
+  // 위치 적용
+  const position = localStorage.getItem('userMenuPosition') || 'center';
+  applyUserMenuPosition(position);
+}
+
+// 사용자 메뉴 모달 닫기
+function closesettingMenuModal() {
+  const modalEl = document.getElementById('settingMenuModal');
+  if (!modalEl) return;
+
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  if (modal) {
+    modal.hide();
+  }
+}
+
+// 사용자 메뉴 위치 적용 (UI Only)
+function applyUserMenuPosition(position) {
+  const dialog = document.getElementById('settingMenuModalDialog');
+  if (!dialog) return;
+
+  // 기존 위치 클래스 제거
+  dialog.classList.remove('modal-dialog-centered', 'modal-dialog-scrollable');
+  dialog.classList.remove('user-menu-top', 'user-menu-center', 'user-menu-top-start');
+
+  // 스타일 초기화
+  dialog.style.marginTop = '';
+  dialog.style.marginLeft = '';
+
+  // 위치에 따라 스타일 적용
+  switch (position) {
+    case 'center':
+      dialog.classList.add('modal-dialog-centered');
+      break;
+    case 'top':
+      dialog.style.marginTop = '60px';
+      break;
+    case 'top-start':
+      dialog.style.marginTop = '60px';
+      dialog.style.marginLeft = '10px';
+      break;
+  }
+}
+
+// 사용자 메뉴 위치 변경
+function changeUserMenuPosition(position, save = true) {
+  applyUserMenuPosition(position);
+
+  if (save) {
+    SettingsAPI.save('ui', 'user_menu_position', position);
+    localStorage.setItem('userMenuPosition', position);
+
+    if (typeof showToast === 'function') {
+      const positionName = position === 'center' ? '중앙' : position === 'top' ? '상단' : '왼쪽 상단';
+      showToast(`✅ 사용자 메뉴 위치: ${positionName}`, 'success', 1500);
+    }
+  }
+}
+
 // 스크린샷 지연시간 변경
 function changeScreenshotDelay(value, save = true) {
   const delay = parseInt(value, 10);
@@ -240,11 +331,53 @@ function changeScreenshotDelay(value, save = true) {
   }
 }
 
+// 헤더 항목 표시/숨기기
+async function toggleHeaderItem(itemName, visible) {
+  const element = document.querySelector(`[data-header-item="${itemName}"]`);
+  if (!element) return;
+
+  if (visible) {
+    element.style.display = '';
+  } else {
+    element.style.display = 'none';
+  }
+
+  // 현재 header_items 설정 가져오기
+  const settings = await SettingsAPI.load();
+  if (settings && settings.ui && settings.ui.header_items) {
+    settings.ui.header_items[itemName] = visible;
+    // 전체 header_items 저장
+    await SettingsAPI.save('ui', 'header_items', settings.ui.header_items);
+  }
+}
+
+// 모든 헤더 항목 설정 적용
+function applyHeaderItemsSettings(headerItems) {
+  if (!headerItems) return;
+
+  Object.keys(headerItems).forEach(itemName => {
+    const visible = headerItems[itemName];
+    const element = document.querySelector(`[data-header-item="${itemName}"]`);
+    if (element) {
+      element.style.display = visible ? '' : 'none';
+    }
+
+    // 체크박스 상태 업데이트
+    const checkbox = document.getElementById(`headerItem${itemName.charAt(0).toUpperCase() + itemName.slice(1)}`);
+    if (checkbox) {
+      checkbox.checked = visible;
+    }
+  });
+}
+
 // 전역 노출
+window.showSettingsMenuModal = showSettingsMenuModal;
+window.closesettingMenuModal = closesettingMenuModal;
 window.changeHeaderMode = changeHeaderMode;
 window.toggleHeaderFixed = toggleHeaderFixed;
 window.changeTextModalPosition = changeTextModalPosition;
 window.changeScreenshotDelay = changeScreenshotDelay;
+window.toggleHeaderItem = toggleHeaderItem;
 
 
 

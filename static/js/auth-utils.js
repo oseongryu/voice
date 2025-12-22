@@ -7,6 +7,16 @@
  * - 인증 상태 관리
  */
 
+// i18n 텍스트 헬퍼 함수
+const getText = (key, fallback) => (typeof t === 'function' ? t(key) : fallback);
+
+// 인증 관련 텍스트 (i18n 지원)
+const AUTH_TEXT = {
+  get apiRequired() { return getText('toast.auth.api_required', 'API 인증이 필요합니다.'); },
+  get sessionExpired() { return getText('toast.auth.session_expired', '세션이 만료되었습니다. 다시 로그인해주세요.'); },
+  get apiAuthNeeded() { return getText('toast.auth.api_auth_needed', 'API 사용을 위해 API 인증이 필요합니다'); }
+};
+
 // 인증 상태 관리 변수들
 let isAuthCheckInProgress = false;
 let authCheckPromise = null;
@@ -562,7 +572,7 @@ function handle401Error(response = null, context = '') {
     console.log('API 서버 인증 실패 - 로그인 상태 유지, API 인증만 필요');
     // 토스트 메시지 표시
     if (typeof showToast === 'function') {
-      showToast('🔐 API 인증이 필요합니다.', 'warning', 3000);
+      showToast(`🔐 ${AUTH_TEXT.apiRequired}`, 'warning', 3000);
     }
     // API 인증 모달 표시
     if (typeof showServerConfigModal === 'function') {
@@ -575,7 +585,7 @@ function handle401Error(response = null, context = '') {
 
     // 토스트 메시지 표시 (있다면)
     if (typeof showToast === 'function') {
-      showToast('🔐 세션이 만료되었습니다. 다시 로그인해주세요.', 'warning', 3000);
+      showToast(`🔐 ${AUTH_TEXT.sessionExpired}`, 'warning', 3000);
     }
 
     // 로그인 모달 표시
@@ -620,7 +630,7 @@ async function authenticatedFetch(url, options = {}) {
       if (result.require_second_auth) {
         console.warn('API 사용을 위해 API 인증이 필요합니다');
         if (typeof showToast === 'function') {
-          showToast('🔐 API 사용을 위해 API 인증이 필요합니다', 'warning', 5000);
+          showToast(`🔐 ${AUTH_TEXT.apiAuthNeeded}`, 'warning', 5000);
         }
         // API 인증 모달 표시
         if (typeof showServerConfigModal === 'function') {
@@ -831,7 +841,7 @@ function setupGlobalFetchWrapper() {
               if (result.require_second_auth) {
                 console.warn('API 사용을 위해 API 인증이 필요합니다');
                 if (typeof showToast === 'function') {
-                  showToast('🔐 API 사용을 위해 API 인증이 필요합니다', 'warning', 5000);
+                  showToast(`🔐 ${AUTH_TEXT.apiAuthNeeded}`, 'warning', 5000);
                 }
                 // API 인증 모달 표시
                 if (typeof showServerConfigModal === 'function') {

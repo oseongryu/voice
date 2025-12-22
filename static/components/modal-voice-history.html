@@ -4,7 +4,8 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header" style="padding: 0.5rem 1rem;">
-                <h6 class="modal-title" id="voiceHistoryModalLabel" style="font-size: 0.95rem;">🎤 음성 히스토리</h6>
+                <h6 class="modal-title" id="voiceHistoryModalLabel" style="font-size: 0.95rem;">🎤 <span
+                        data-i18n="modal.history.title">음성 히스토리</span></h6>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"
                     style="font-size: 0.8rem;"></button>
             </div>
@@ -13,9 +14,10 @@
                 <div class="text-input-section mb-3">
                     <div class="input-group">
                         <input type="text" id="voiceTextInput" class="form-control"
+                            data-i18n-placeholder="modal.history.input_placeholder"
                             placeholder="텍스트를 입력하고 Enter를 누르거나 추가 버튼을 클릭하세요..." />
                         <button id="voiceAddTextBtn" class="btn btn-primary" onclick="addTextToVoiceHistory()">
-                            추가
+                            <span data-i18n="modal.history.add">추가</span>
                         </button>
                     </div>
                 </div>
@@ -24,52 +26,54 @@
                 <div class="voice-controls d-flex flex-wrap gap-2 mb-3">
                     <button id="voiceRequestPermissionBtn" class="btn btn-outline-secondary btn-sm"
                         onclick="requestVoiceMicrophonePermission()">
-                        🎤 마이크 권한
+                        🎤 <span data-i18n="modal.history.mic_permission">마이크 권한</span>
                     </button>
                     <button id="voiceRecordBtn" class="btn btn-danger btn-sm" onclick="startVoiceRecording()">
-                        음성녹음
+                        <span data-i18n="modal.history.record">음성녹음</span>
                     </button>
                     <button id="voiceStopBtn" class="btn btn-dark btn-sm" onclick="stopVoiceRecording()"
                         style="display: none">
-                        녹음중지
+                        <span data-i18n="modal.history.stop">녹음중지</span>
                     </button>
                     <button id="voiceRefreshHistoryBtn" class="btn btn-secondary btn-sm"
-                        onclick="loadVoiceServerHistory()">
+                        onclick="loadVoiceServerHistory()" data-i18n="modal.history.refresh">
                         새로고침
                     </button>
                     <button id="voiceSelectAllBtn" class="btn btn-outline-secondary btn-sm"
-                        onclick="selectAllVoiceHistory()">
+                        onclick="selectAllVoiceHistory()" data-i18n="modal.history.select_all">
                         전체선택
                     </button>
                     <button id="voiceCopySelectedBtn" class="btn btn-outline-secondary btn-sm"
-                        onclick="copySelectedVoiceHistory()">
+                        onclick="copySelectedVoiceHistory()" data-i18n="modal.history.copy_selected">
                         선택복사
                     </button>
                     <button id="voiceCopyToServerBtn" class="btn btn-outline-primary btn-sm"
-                        onclick="copySelectedToServerClipboard()">
+                        onclick="copySelectedToServerClipboard()" data-i18n="modal.history.copy_to_server">
                         서버복사
                     </button>
                     <button id="voiceExecuteSelectedBtn" class="btn btn-success btn-sm"
-                        onclick="executeSelectedVoiceHistory()">
+                        onclick="executeSelectedVoiceHistory()" data-i18n="modal.history.execute">
                         실행
                     </button>
                     <button id="voiceDeleteSelectedBtn" class="btn btn-danger btn-sm"
-                        onclick="deleteSelectedVoiceHistory()" style="display: none">
+                        onclick="deleteSelectedVoiceHistory()" style="display: none"
+                        data-i18n="modal.history.delete_selected">
                         선택삭제
                     </button>
                     <button id="voiceClearServerHistoryBtn" class="btn btn-outline-danger btn-sm"
-                        onclick="clearVoiceServerHistory()">
+                        onclick="clearVoiceServerHistory()" data-i18n="modal.history.clear_all">
                         전체삭제
                     </button>
                     <button id="voiceExportHistoryBtn" class="btn btn-outline-secondary btn-sm"
-                        onclick="exportVoiceHistory()">
+                        onclick="exportVoiceHistory()" data-i18n="modal.history.export">
                         내보내기
                     </button>
                 </div>
 
                 <!-- 히스토리 카운터 -->
                 <div class="mb-2 text-muted">
-                    음성 변환 히스토리 <span id="voiceHistoryCounter">(총 0개)</span>
+                    <span data-i18n="modal.history.counter">음성 변환 히스토리</span> <span id="voiceHistoryCounter">(<span
+                            data-i18n="modal.history.total">총</span> 0개)</span>
                 </div>
 
                 <!-- 히스토리 그리드 -->
@@ -79,7 +83,7 @@
                         <div class="spinner-border spinner-border-sm me-2" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        히스토리를 불러오는 중...
+                        <span data-i18n="modal.history.loading">히스토리를 불러오는 중...</span>
                     </div>
                 </div>
             </div>

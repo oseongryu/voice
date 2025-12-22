@@ -1,67 +1,68 @@
 <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-lock-fill"></i> 로그인
-        </h5>
+      <div class="modal-header" style="padding: 0.5rem 1rem;">
+        <h6 class="modal-title" style="font-size: 0.95rem;">
+          <i class="bi bi-lock-fill"></i> <span data-i18n="modal.login.title">로그인</span>
+        </h6>
       </div>
       <div class="modal-body">
         <!-- Stage 1: Username/Password -->
         <div id="loginStage1">
           <div class="mb-3">
             <label class="form-label">
-              <i class="bi bi-shield-lock"></i> 로그인 서버 URL
+              <i class="bi bi-shield-lock"></i> <span data-i18n="modal.login.server_url">로그인 서버 URL</span>
             </label>
             <input type="text" class="form-control" id="loginServerUrl"
+              data-i18n-placeholder="modal.login.server_url_placeholder"
               placeholder="http://localhost:8000 또는 https://your-server.com">
           </div>
           <div class="mb-3">
             <label class="form-label">
-              <i class="bi bi-person"></i> 사용자명
+              <i class="bi bi-person"></i> <span data-i18n="modal.login.username">사용자명</span>
             </label>
             <input type="text" class="form-control" id="loginUsername" autocomplete="username">
           </div>
           <div class="mb-3">
             <label class="form-label">
-              <i class="bi bi-key"></i> 비밀번호
+              <i class="bi bi-key"></i> <span data-i18n="modal.login.password">비밀번호</span>
             </label>
             <input type="password" class="form-control" id="loginPassword" autocomplete="current-password">
           </div>
           <button class="btn btn-primary w-100" onclick="handleModalLogin()">
-            로그인
+            <span data-i18n="modal.login.login_button">로그인</span>
           </button>
         </div>
 
         <!-- Stage 2: 2FA Code -->
         <div id="loginStage2" style="display:none">
-          <p class="text-center text-muted">2단계 인증 코드를 입력하세요</p>
+          <p class="text-center text-muted" data-i18n="modal.login.2fa_prompt">2단계 인증 코드를 입력하세요</p>
           <div class="mb-3">
-            <label class="form-label">인증 코드</label>
+            <label class="form-label" data-i18n="modal.login.auth_code">인증 코드</label>
             <input type="text" class="form-control text-center fs-4" id="loginTotpCode" placeholder="000000"
               maxlength="6" autocomplete="one-time-code" style="letter-spacing: 0.5rem;">
           </div>
           <button class="btn btn-primary w-100 mb-2" onclick="handleModalTOTPLogin()">
-            인증
+            <span data-i18n="modal.login.auth_button">인증</span>
           </button>
           <button class="btn btn-outline-secondary w-100" onclick="showModalBackupCode()">
-            백업 코드 사용
+            <span data-i18n="modal.login.use_backup">백업 코드 사용</span>
           </button>
         </div>
 
         <!-- Stage 3: Backup Code -->
         <div id="loginStage3" style="display:none">
-          <p class="text-center text-muted">백업 코드를 입력하세요</p>
+          <p class="text-center text-muted" data-i18n="modal.login.backup_prompt">백업 코드를 입력하세요</p>
           <div class="mb-3">
-            <label class="form-label">백업 코드</label>
+            <label class="form-label" data-i18n="modal.login.backup_code">백업 코드</label>
             <input type="text" class="form-control text-center" id="loginBackupCode" placeholder="XXXXXXXX"
               style="letter-spacing: 0.2rem;">
           </div>
           <button class="btn btn-warning w-100 mb-2" onclick="handleModalBackupLogin()">
-            백업 코드로 로그인
+            <span data-i18n="modal.login.backup_login">백업 코드로 로그인</span>
           </button>
           <button class="btn btn-outline-secondary w-100" onclick="backToModalTOTP()">
-            인증 코드로 돌아가기
+            <span data-i18n="modal.login.back_to_2fa">인증 코드로 돌아가기</span>
           </button>
         </div>
 
